@@ -1,0 +1,11 @@
+node_modules
+dist
+.data
+.nitro
+.cache
+.output
+.env*
+.dev.vars
+.wrangler
+vendor
+*.tgz

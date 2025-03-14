@@ -1,0 +1,16 @@
+{
+  "name": "playground-b",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "playground-b": "index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playground-a": "link:../playground-a"
+  }
+}

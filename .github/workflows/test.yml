@@ -1,0 +1,32 @@
+name: E2E Test
+on:
+  push:
+    branches:
+      - main
+      - release
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          npm install -g corepack@latest
+          corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - run: pnpm install
+
+      # - run: pnpm tsx script/ci.ts
+      #   working-directory: ./packages/backend
+      #   env:
+      #     NITRO_WEBHOOK_SECRET: ${{ secrets.NITRO_WEBHOOK_SECRET }}
+      #     NITRO_APP_ID: ${{ secrets.NITRO_APP_ID }}
+      #     NITRO_PRIVATE_KEY: ${{ secrets.NITRO_PRIVATE_KEY }}
+      #     NITRO_RM_STALE_KEY: ${{ secrets.NITRO_RM_STALE_KEY }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: pnpm test
