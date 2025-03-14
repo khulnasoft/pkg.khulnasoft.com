@@ -35,7 +35,7 @@
     "octokit": "^3.2.1",
     "query-registry": "^3.0.1",
     "unstorage": "^1.10.2",
-    "vitest": "2.1.8",
+    "vitest": "2.1.9",
     "wrangler": "^3.57.1"
   }
 }
