@@ -28,14 +28,14 @@
     "@pkg-khulnasoft/utils": "workspace:^",
     "@simulacrum/github-api-simulator": "^0.5.4",
     "dotenv": "^16.4.5",
-    "fast-jwt": "^4.0.2",
+    "fast-jwt": "^5.0.6",
     "h3": "^1.11.1",
     "nitro-cloudflare-dev": "0.1.2",
     "nitropack": "^2.9.6",
     "octokit": "^3.2.1",
     "query-registry": "^3.0.1",
     "unstorage": "^1.10.2",
-    "vitest": "2.1.8",
+    "vitest": "2.1.9",
     "wrangler": "^3.57.1"
   }
 }
