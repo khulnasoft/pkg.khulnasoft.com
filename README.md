@@ -46,7 +46,7 @@ These are some of the projects and companies using pkg.khulnasoft.com:
   <a href="https://www.radix-vue.com/"><img src="https://www.radix-vue.com/logo.svg" height="40"></a>
   <a href="https://www.gradio.app/"><img src="https://www.gradio.app/_app/immutable/assets/gradio.CHB5adID.svg" height="40"></a>
   <a href="https://clockworklabs.io/"><img src="https://github.com/user-attachments/assets/85d42291-6676-4592-b6a0-ee4b6350dc47" height="40"></a>
-  <a href="https://valtio.pmnd.rs/"><img src="https://blog.stackblitz.com/posts/pkg-pr-new/valtio.svg" height="40"></a>
+  <a href="https://valtio.pmnd.rs/"><img src="https://blog.stackblitz.com/posts/pkg-khulnasoft/valtio.svg" height="40"></a>
   <a href="https://github.com/nksaraf/vinxi"><img src="https://github.com/nksaraf/vinxi/raw/main/docs/public/logo.png" height="40"></a>
   <a href="https://github.com/scalar/scalar"><img src="https://github.com/scalar.png" height="40"></a>
   <a href="https://tresjs.org/"><img src="https://avatars.githubusercontent.com/u/119253150?s=200&v=4" height="40"></a>
@@ -88,37 +88,37 @@ These are some of the projects and companies using pkg.khulnasoft.com:
 
 Feel free to add your project or company here to join the pkg.khulnasoft.com family :)
 
-You can also join our discord server [here](https://discord.gg/stackblitz), so we all have fun together!
+You can also join our discord server [here](https://discord.gg/khulnasoft), so we all have fun together!
 
 ## Setup
 
-First [install the GitHub Application](https://github.com/apps/pkg-pr-new).
+First [install the GitHub Application](https://github.com/apps/pkg-khulnasoft).
 
 > [!IMPORTANT]
 > Make sure it's installed on the repository before trying to publish a package. To read about the permissions the app needs, check [#305](https://github.com/khulnasoft/pkg.khulnasoft.com/issues/305).
 
-After installing on your repository, you can run `npx pkg-pr-new publish` in your workflows and then you have continuous releases!
+After installing on your repository, you can run `npx pkg-khulnasoft publish` in your workflows and then you have continuous releases!
 
 ```sh
-npm install --save-dev pkg-pr-new # or `npx pkg-pr-new publish`
+npm install --save-dev pkg-khulnasoft # or `npx pkg-khulnasoft publish`
 ```
 
 For workspaces and monorepos:
 
 ```sh
-npx pkg-pr-new publish './packages/A' './packages/B' # or `npx pkg-pr-new publish './packages/*'`
+npx pkg-khulnasoft publish './packages/A' './packages/B' # or `npx pkg-khulnasoft publish './packages/*'`
 ```
 
 > [!IMPORTANT]
-> Make sure the pkg-pr-new command runs only once in a defined workflow (that's part of how it avoids spam)! So instead of multiple times running pkg-pr-new for each workspace package, the command should be run one time for all the desired packages using the pattern above.
+> Make sure the pkg-khulnasoft command runs only once in a defined workflow (that's part of how it avoids spam)! So instead of multiple times running pkg-khulnasoft for each workspace package, the command should be run one time for all the desired packages using the pattern above.
 
 For templates (experimental):
 
 > [!NOTE]
-> With templates, pkg.khulnasoft.com will generate Stackblitz instances for the given directories with the new built packages.
+> With templates, pkg.khulnasoft.com will generate Khulnasoft instances for the given directories with the new built packages.
 
 ```sh
-npx pkg-pr-new publish './packages/A' --template './examples/*'
+npx pkg-khulnasoft publish './packages/A' --template './examples/*'
 ```
 
 By default, pkg.khulnasoft.com will generate a template called "default" which includes each built package in the dependencies. This can be disabled with `--no-template`.
@@ -126,7 +126,7 @@ By default, pkg.khulnasoft.com will generate a template called "default" which i
 For shorter urls, `--compact` can be useful:
 
 ```sh
-npx pkg-pr-new publish --compact './packages/A' './packages/B'
+npx pkg-khulnasoft publish --compact './packages/A' './packages/B'
 ```
 
 > `--compact` requires your package to be a valid (published) package on npm with a specified `repository` field in the package.json! See [this](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#repository). pkg.khulnasoft.com is case sensitive, if the GitHub owner is `PuruVJ`, the package.json `repository` field should not have `puruvj`.
@@ -146,25 +146,25 @@ npm i https://pkg.khulnasoft.com/tinylibs/tinybench/tinybench@a832a55
 For CLI applications you might want to show `npx` instead of `npm i` for the preview command. This can be accomplished with the `--bin` flag:
 
 ```sh
-npx pkg-pr-new publish --bin
+npx pkg-khulnasoft publish --bin
 ```
 
 With `--bin`:
 
 ```sh
-npx https://pkg.khulnasoft.com/pkg-pr-new@a832a55
+npx https://pkg.khulnasoft.com/pkg-khulnasoft@a832a55
 ```
 
 Without `--bin`:
 
 ```sh
-npm i https://pkg.khulnasoft.com/pkg-pr-new@a832a55
+npm i https://pkg.khulnasoft.com/pkg-khulnasoft@a832a55
 ```
 
 You can control publishing comments with `--comment`:
 
 ```sh
-npx pkg-pr-new publish --comment=update # default
+npx pkg-khulnasoft publish --comment=update # default
 ```
 
 Using `--comment=update`, pkg.khulnasoft.com would generate one initial comment and then edit it in the following commits.
@@ -211,7 +211,7 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - run: pnpm dlx pkg-pr-new publish
+      - run: pnpm dlx pkg-khulnasoft publish
 ```
 
 #### Release approved pull requests only:
@@ -256,7 +256,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - run: pnpm dlx pkg-pr-new publish
+      - run: pnpm dlx pkg-khulnasoft publish
 ```
 
 > Releasing approved pull requests is the recommended way of having continuous releases. This ensures users always install approved and safe packages.
@@ -288,7 +288,7 @@ For advanced use cases where you want more control over the messages posted by p
 
 ```yml
 - name: Publish packages
-  run: npx pkg-pr-new publish --json output.json --comment=off
+  run: npx pkg-khulnasoft publish --json output.json --comment=off
 ```
 
 2. Add a custom step in your workflow to process the JSON output and create a custom comment:

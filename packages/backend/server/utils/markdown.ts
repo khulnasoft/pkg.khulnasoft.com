@@ -116,7 +116,7 @@ function generateTemplatesStr(templates: Record<string, string>) {
   const entries = Object.entries(templates).filter(([k]) => k !== "default");
   let str =
     entries.length === 0 && templates.default
-      ? `[Open in StackBlitz](${templates.default})`
+      ? `[Open in KhulnaSoft](${templates.default})`
       : "";
 
   if (entries.length > 0 && entries.length <= 2) {

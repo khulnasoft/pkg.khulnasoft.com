@@ -82,7 +82,7 @@ export default eventHandler(async (event) => {
     throw createError({
       statusCode: 401,
       message:
-        "Try publishing from a github workflow! Also make sure you install https://github.com/apps/pkg-pr-new GitHub app on the repo",
+        "Try publishing from a github workflow! Also make sure you install https://github.com/apps/pkg-khulnasoft GitHub app on the repo",
     });
   }
 

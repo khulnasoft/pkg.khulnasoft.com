@@ -27,7 +27,7 @@ export default eventHandler(async (event) => {
     throw createError({
       statusCode: 404,
       fatal: true,
-      message: `The app https://github.com/apps/pkg-pr-new is not installed on ${owner}/${repo}.`,
+      message: `The app https://github.com/apps/pkg-khulnasoft is not installed on ${owner}/${repo}.`,
     });
   }
 

@@ -18,13 +18,13 @@ beforeAll(async () => {
       organizations: [
         { login: "khulnasoft" },
         { login: "tinylibs" },
-        { login: "stackblitz" },
+        { login: "khulnasoft" },
       ],
       repositories: [
         { owner: "khulnasoft", name: "temporary-test" },
         { owner: "khulnasoft", name: "pkg.khulnasoft.com" },
         { owner: "tinylibs", name: "tinybench" },
-        { owner: "stackblitz", name: "sdk" },
+        { owner: "khulnasoft", name: "sdk" },
       ],
       branches: [{ name: "main" }],
       blobs: [],
@@ -49,7 +49,7 @@ beforeAll(async () => {
   const url = `${worker.proxyData.userWorkerUrl.protocol}//${worker.proxyData.userWorkerUrl.hostname}:${worker.proxyData.userWorkerUrl.port}`;
   workerUrl = url;
   await ezSpawn.async(
-    `pnpm cross-env TEST=true API_URL=${url} pnpm --filter=pkg-pr-new run build`,
+    `pnpm cross-env TEST=true API_URL=${url} pnpm --filter=pkg-khulnasoft run build`,
     [],
     {
       stdio: "inherit",

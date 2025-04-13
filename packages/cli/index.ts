@@ -47,7 +47,7 @@ const completeMultipart = new URL("/multipart/complete", apiUrl);
 const main = defineCommand({
   meta: {
     version: pkg.version,
-    name: "stackblitz",
+    name: "khulnasoft",
     description: "A CLI for pkg.khulnasoft.com (Continuous Releases)",
   },
   subCommands: {
