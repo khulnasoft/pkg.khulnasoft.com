@@ -1,0 +1,8 @@
+// https://nitro.unjs.io/guide/typescript
+{
+  "compilerOptions": {
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "extends": "../backend/.nitro/types/tsconfig.json"
+}

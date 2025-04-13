@@ -1,0 +1,38 @@
+{
+  "name": "pkg-khulnasoft",
+  "version": "0.0.42",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "pkg-khulnasoft": "bin/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/khulnasoft/pkg.khulnasoft.com",
+    "directory": "packages/cli"
+  },
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "build:publish": "API_URL=https://pkg.khulnasoft.com/ tsup"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@jsdevtools/ez-spawn": "^3.0.4",
+    "@octokit/action": "^6.1.0",
+    "ignore": "^5.3.1",
+    "isbinaryfile": "^5.0.2",
+    "pkg-types": "^1.1.1",
+    "query-registry": "^3.0.1",
+    "tinyglobby": "^0.2.9",
+    "@pkg-khulnasoft/utils": "workspace:^"
+  },
+  "devDependencies": {
+    "@pkg-khulnasoft/utils": "workspace:^",
+    "citty": "^0.1.6",
+    "tsup": "^8.0.2"
+  }
+}

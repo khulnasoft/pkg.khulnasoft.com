@@ -1,0 +1,119 @@
+name: Preview & Release
+on:
+  push:
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    environment: ${{ startsWith(github.ref, 'refs/tags/v') && 'Production' || 'Staging' }}
+    outputs:
+      deployment-url: ${{ steps.deploy.outputs.deployment-url}}
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          npm install -g corepack@latest
+          corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Deploy
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          wranglerVersion: "* -w"
+          packageManager: pnpm # you can omit this if you use npm
+          workingDirectory: "packages/backend"
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          preCommands: pnpm install && pnpm build
+          command: pages deploy dist --project-name=pkg-khulnasoft --branch=main
+      - name: Deployment Url
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+        run: echo $DEPLOYMENT_URL
+
+  release:
+    environment: Production
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    needs: deploy
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          npm install -g corepack@latest
+          corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+          cache: "pnpm"
+      - run: pnpm install
+      - run: |
+          pnpm build:publish
+          npm publish --access public # new version is already set before the tag event
+        working-directory: ./packages/cli
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  cr:
+    concurrency:
+      group: continuous-releases
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          npm install -g corepack@latest
+          corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "pnpm"
+      - run: pnpm install
+      - run: echo $API_URL ; pnpm build
+        env:
+          API_URL: ${{ needs.deploy.outputs.deployment-url }}
+
+      - run: pnpm tsx script/ci.ts
+        working-directory: ./packages/backend
+        env:
+          NITRO_WEBHOOK_SECRET: ${{ secrets.NITRO_WEBHOOK_SECRET }}
+          NITRO_APP_ID: ${{ secrets.NITRO_APP_ID }}
+          NITRO_PRIVATE_KEY: ${{ secrets.NITRO_PRIVATE_KEY }}
+          NITRO_RM_STALE_KEY: ${{ secrets.NITRO_RM_STALE_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: pnpm tsx script/update-webhook-url.ts
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        working-directory: ./packages/backend
+        env:
+          API_URL: ${{ needs.deploy.outputs.deployment-url }}
+          # NITRO_WEBHOOK_SECRET: ${{ secrets.NITRO_WEBHOOK_SECRET }}
+          NITRO_APP_ID: ${{ secrets.NITRO_APP_ID }}
+          NITRO_PRIVATE_KEY: ${{ secrets.NITRO_PRIVATE_KEY }}
+          # NITRO_RM_STALE_KEY: ${{ secrets.NITRO_RM_STALE_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: dummy big file
+        run: |
+          file_size=120  # 120 MB
+          file_path="dummy_random_content.txt"
+          file_size_in_bytes=$((file_size * 1024 * 1024))
+          head -c $file_size_in_bytes </dev/urandom >$file_path
+          echo "File $file_path created with random content of size $file_size MB."
+        working-directory: ./playgrounds/playground-b
+
+      - name: pkg.khulnasoft.com
+        run: pnpm publish:playgrounds

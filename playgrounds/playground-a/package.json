@@ -1,0 +1,17 @@
+{
+  "name": "playground-a",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "playground-a": "index.js"
+  },
+  "scripts": {
+    "prepack": "echo \"prepack\"",
+    "postpack": "echo \"postpack\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
