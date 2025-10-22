@@ -11,8 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "playground-a": "link:../../playgrounds/playground-a",
-    "playground-b": "link:../../playgrounds/playground-b",
-    "pkg-khulnasoft": "workspace:*"
+    "playground-b": "link:../../playgrounds/playground-b"
   },
   "peerDependencies": {
     "pkg-khulnasoft": "workspace:*"

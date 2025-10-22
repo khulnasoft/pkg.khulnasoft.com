@@ -21,6 +21,7 @@ import { isBinaryFile } from "isbinaryfile";
 import { writePackageJSON, type PackageJson } from "pkg-types";
 import pkg from "./package.json" with { type: "json" };
 import { createDefaultTemplate } from "./template";
+import * as core from "@actions/core";
 
 declare global {
   const API_URL: string;
@@ -47,7 +48,7 @@ const completeMultipart = new URL("/multipart/complete", apiUrl);
 const main = defineCommand({
   meta: {
     version: pkg.version,
-    name: "khulnasoft",
+    name: "stackblitz",
     description: "A CLI for pkg.khulnasoft.com (Continuous Releases)",
   },
   subCommands: {
@@ -68,6 +69,14 @@ const main = defineCommand({
           pnpm: {
             type: "boolean",
             description: "use `pnpm pack` instead of `npm pack --json`",
+          },
+          yarn: {
+            type: "boolean",
+            description: "use `yarn pack` instead of `npm pack --json`",
+          },
+          bun: {
+            type: "boolean",
+            description: "use `bun pm pack` instead of `npm pack --json`",
           },
           template: {
             type: "string",
@@ -126,6 +135,8 @@ const main = defineCommand({
             packMethod = "pnpm";
           } else if (args.yarn) {
             packMethod = "yarn";
+          } else if (args.bun) {
+            packMethod = "bun";
           }
 
           const isPeerDepsEnabled = !!args.peerDeps;
@@ -159,6 +170,7 @@ const main = defineCommand({
             GITHUB_RUN_ID,
             GITHUB_RUN_ATTEMPT,
             GITHUB_ACTOR_ID,
+            GITHUB_OUTPUT,
           } = process.env;
 
           const [owner, repo] = GITHUB_REPOSITORY.split("/");
@@ -188,6 +200,7 @@ const main = defineCommand({
           }
 
           const { sha } = await checkResponse.json();
+          const formattedSha = isCompact ? abbreviateCommitHash(sha) : sha;
 
           const deps: Map<string, string> = new Map(); // pkg.khulnasoft.com versions of the package
           const realDeps: Map<string, string> | null = isPeerDepsEnabled
@@ -220,26 +233,32 @@ const main = defineCommand({
             if (isCompact) {
               await verifyCompactMode(pJson.name);
             }
-
-            const formattedSha = isCompact ? abbreviateCommitHash(sha) : sha;
-            const depUrl = new URL(
+            const longDepUrl = new URL(
               `/${owner}/${repo}/${pJson.name}@${formattedSha}`,
               apiUrl,
             ).href;
-            deps.set(pJson.name, depUrl);
-            realDeps?.set(pJson.name, pJson.version ?? depUrl);
+            deps.set(pJson.name, longDepUrl);
+            realDeps?.set(pJson.name, pJson.version ?? longDepUrl);
 
-            const resource = await fetch(depUrl);
+            const controller = new AbortController();
+            const resource = await fetch(longDepUrl, {
+              signal: controller.signal,
+            });
             if (resource.ok) {
               console.warn(
-                `${pJson.name}@${formattedSha} was already published on ${depUrl}`,
+                `${pJson.name}@${formattedSha} was already published on ${longDepUrl}`,
               );
             }
+            controller.abort();
+
+            const jsonUrl = isCompact
+              ? new URL(`/${pJson.name}@${formattedSha}`, apiUrl).href
+              : longDepUrl;
 
             // Collect package metadata
             outputMetadata.packages.push({
               name: pJson.name,
-              url: depUrl,
+              url: jsonUrl,
               shasum: "", // will be filled later
             });
           }
@@ -504,6 +523,12 @@ const main = defineCommand({
             `publishing failed: ${await res.text()}`,
           );
 
+          const debug = laterRes.debug;
+
+          core.startGroup("🔍 Info");
+          core.notice(JSON.stringify(debug, null, 2));
+          core.endGroup();
+
           console.warn("\n");
           console.warn("⚡️ Your npm packages are published.\n");
 
@@ -533,6 +558,18 @@ const main = defineCommand({
             await fs.writeFile(jsonFilePath, output);
             console.warn(`metadata written to ${jsonFilePath}`);
           }
+
+          await fs.appendFile(GITHUB_OUTPUT, `sha=${formattedSha}\n`, "utf8");
+          await fs.appendFile(
+            GITHUB_OUTPUT,
+            `urls=${outputMetadata.packages.map((pkg) => pkg.url).join(" ")}\n`,
+            "utf8",
+          );
+          await fs.appendFile(
+            GITHUB_OUTPUT,
+            `packages=${outputMetadata.packages.map((pkg) => `${pkg.name}@${pkg.url}`).join(" ")}\n`,
+            "utf8",
+          );
         },
       };
     },
@@ -551,13 +588,15 @@ runMain(main)
   .then(() => process.exit(0))
   .catch(() => process.exit(1));
 
-type PackMethod = "npm" | "pnpm" | "yarn";
+type PackMethod = "npm" | "pnpm" | "yarn" | "bun";
 
 async function resolveTarball(pm: PackMethod, p: string, pJson: PackageJson) {
   let cmd = `${pm} pack`;
   let filename = `${pJson.name!.replace("/", "-")}-${pJson.version}.tgz`;
   if (pm === "yarn") {
     cmd += ` --filename ${filename}`;
+  } else if (pm === "bun") {
+    cmd = `bun pm pack --filename ${filename}`;
   }
   const { stdout } = await ezSpawn.async(cmd, {
     stdio: "overlapped",
@@ -565,7 +604,7 @@ async function resolveTarball(pm: PackMethod, p: string, pJson: PackageJson) {
   });
   const lines = stdout.split("\n").filter(Boolean);
 
-  if (pm !== "yarn") {
+  if (pm !== "yarn" && pm !== "bun") {
     filename = lines[lines.length - 1].trim();
   }
 

@@ -1,5 +1,7 @@
 <p align="center"><img src="https://github.com/user-attachments/assets/314d5112-f67f-4758-82bf-7b0c19c01ba6" /></p>
 
+**[Cloudflare is now backing pkg.khulnasoft.com's data infrastructure!](https://blog.stackblitz.com/posts/cloudflare-backing-pkg-khulnasoft-data-infrastructure/)**
+
 # pkg.khulnasoft.com <span><img src="https://emoji.slack-edge.com/TFHDVN56F/stackblitz/fd010078dcccebca.png" width="30" /></span>
 
 > We call it "Continuous Releases" too.
@@ -26,6 +28,24 @@ It is aiming to reduce the number of these comments :)
 
 > This was fixed in #18. Can we release that fix?
 
+## Badge
+
+Show that your project uses pkg.khulnasoft.com by adding a badge to your README:
+
+[![pkg.khulnasoft.com](https://pkg.khulnasoft.com/badge/khulnasoft/pkg.khulnasoft.com)](https://pkg.khulnasoft.com/~/khulnasoft/pkg.khulnasoft.com)
+
+### How to Get a Badge for Your Repository
+
+1. **Automatically on Repository Page**:
+   Visit your repository page at `https://pkg.khulnasoft.com/~/OWNER/REPO` and you'll find a badge with a copy button that will copy the markdown code for you.
+
+2. **Direct Badge URL**:
+   Use this format to create a badge for your repository:
+   ```markdown
+   [![pkg.khulnasoft.com](https://pkg.khulnasoft.com/badge/OWNER/REPO)](https://pkg.khulnasoft.com/~/OWNER/REPO)
+   ```
+   Just replace `OWNER` and `REPO` with your GitHub username/organization and repository name.
+
 These are some of the projects and companies using pkg.khulnasoft.com:
 
 <p align="center">
@@ -42,8 +62,9 @@ These are some of the projects and companies using pkg.khulnasoft.com:
   <a href="https://tanstack.com/"><img src="https://avatars.githubusercontent.com/u/72518640?s=200&v=4" height="40"></a>
   <a href="https://biomejs.dev/"><img src="https://github.com/biomejs.png" height="40"></a>
   <a href="https://github.com/tinylibs"><img src="https://github.com/tinylibs.png" height="40"></a>
+  <a href="https://github.com/sanity-io/sanity"><picture><source media="(prefers-color-scheme: dark)" srcset="https://www.sanity.io/static/images/logo_white.svg"><source media="(prefers-color-scheme: light)" srcset="https://www.sanity.io/static/images/logo_black.svg"><img height="40" alt="Sanity" src="https://www.sanity.io/static/images/logo.svg"></picture></a>
   <a href="https://unjs.io/"><img src="https://avatars.githubusercontent.com/u/80154025?s=200&v=4" height="40"></a>
-  <a href="https://www.radix-vue.com/"><img src="https://www.radix-vue.com/logo.svg" height="40"></a>
+  <a href="https://reka-ui.com/"><img src="https://reka-ui.com/logo.svg" height="40"></a>
   <a href="https://www.gradio.app/"><img src="https://www.gradio.app/_app/immutable/assets/gradio.CHB5adID.svg" height="40"></a>
   <a href="https://clockworklabs.io/"><img src="https://github.com/user-attachments/assets/85d42291-6676-4592-b6a0-ee4b6350dc47" height="40"></a>
   <a href="https://valtio.pmnd.rs/"><img src="https://blog.stackblitz.com/posts/pkg-khulnasoft/valtio.svg" height="40"></a>
@@ -84,11 +105,15 @@ These are some of the projects and companies using pkg.khulnasoft.com:
    <a href="https://kysely.dev"><img src="https://kysely.dev/img/logo.svg" height="40" /></a>
    <a href="https://tutorialkit.dev/"><img src="https://raw.githubusercontent.com/stackblitz/tutorialkit/refs/tags/1.3.0/extensions/vscode/resources/tutorialkit-icon.png" height="40" /></a>
    <a href="https://heyapi.dev"><img src="https://heyapi.dev/images/logo-300w.png" height="40" /></a>
+   <a href="https://github.com/ant-design"><img src="https://github.com/ant-design.png" height="40" /></a>
+   <a href="https://typeorm.io"><img src="https://github.com/typeorm/typeorm/blob/master/resources/typeorm-logo-colored-light.png" height="40" /></a>
+  <a href="https://preply.com"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/preply/design-system-visual-coverage/refs/heads/main/assets/logo-inverted.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/preply/design-system-visual-coverage/refs/heads/main/assets/logo.svg"><img height="40" alt="Preply" src="https://raw.githubusercontent.com/preply/design-system-visual-coverage/refs/heads/main/assets/logo.svg"></picture></a>
+  <a href="https://github.com/playcanvas/react"><img alt="playcanvas-react" src="https://avatars.githubusercontent.com/u/1030579?v=4" height="40" /></a>
 </p>
 
 Feel free to add your project or company here to join the pkg.khulnasoft.com family :)
 
-You can also join our discord server [here](https://discord.gg/khulnasoft), so we all have fun together!
+You can also join our discord server [here](https://discord.gg/stackblitz), so we all have fun together!
 
 ## Setup
 
@@ -115,7 +140,7 @@ npx pkg-khulnasoft publish './packages/A' './packages/B' # or `npx pkg-khulnasof
 For templates (experimental):
 
 > [!NOTE]
-> With templates, pkg.khulnasoft.com will generate Khulnasoft instances for the given directories with the new built packages.
+> With templates, pkg.khulnasoft.com will generate Stackblitz instances for the given directories with the new built packages.
 
 ```sh
 npx pkg-khulnasoft publish './packages/A' --template './examples/*'
@@ -177,7 +202,7 @@ To customize which package manager is reflected in the comments, use the `--pack
 
 For repositories with many packages, comments might get too long. In that case, you can use `--only-templates` to only show templates.
 
-pkg.khulnasoft.com uses `npm pack --json` under the hood, in case you face issues, you can also use the `--pnpm` or `--yarn` flag so it starts using `pnpm pack` or `yarn pack`. This is not necessary in most cases.
+pkg.khulnasoft.com uses `npm pack --json` under the hood, in case you face issues, you can also use the `--pnpm`, `--yarn`, or `--bun` flag so it starts using `pnpm pack`, `yarn pack`, or `bun pm pack`. This is not necessary in most cases.
 
 <img width="100%" src="https://github.com/khulnasoft/pkg.khulnasoft.com/assets/37929992/2fc03b94-ebae-4c47-a271-03a4ad5d2449" />
 
@@ -190,6 +215,8 @@ pkg.khulnasoft.com is not available in your local environment and it only works 
 ```yml
 name: Publish Any Commit
 on: [push, pull_request]
+
+permissions: {}
 
 jobs:
   build:
@@ -221,6 +248,8 @@ name: Publish Approved Pull Requests
 on:
   pull_request_review:
     types: [submitted]
+
+permissions: {}
 
 jobs:
   check:
@@ -277,6 +306,71 @@ on:
 ```
 
 As noted in [#140](https://github.com/khulnasoft/pkg.khulnasoft.com/issues/140), workflows run on tags too, that's not an issue at all, but in case users would like to avoid duplicate publishes.
+
+#### Run E2E test using outputs
+
+After `pkg-khulnasoft publish` runs successfully, some outputs are available.
+
+- `sha`: The short SHA used. (E.g. `a832a55`)
+- `urls`: Space-separated URLs of published packages.
+- `packages`: Space-separated, Yarn-compatible package locators of published packages.
+
+This is useful for using published packages in other subsequent jobs immediately after publishing. (E.g. E2E tests)
+
+```yml
+name: Publish and Test Packages
+on: [push, pull_request]
+
+permissions: {}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.publish.outputs.sha }}
+      urls: ${{ steps.publish.outputs.urls }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build
+
+      - id: publish
+        run: pnpm dlx pkg-khulnasoft publish
+
+  e2e-test:
+    runs-on: ubuntu-latest
+    needs: publish
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          repository: user/my-package-e2e
+
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Install published package
+        run: pnpm add ${{ needs.publish.outputs.urls }}
+
+      - name: Run e2e test cases
+        run: # ...
+```
 
 ## Custom GitHub Messages and Comments
 
