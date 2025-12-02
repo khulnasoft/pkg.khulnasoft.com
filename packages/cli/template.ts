@@ -1,13 +1,6 @@
-export interface TemplateFiles {
-  [key: string]: string | undefined;
-  "index.js": string;
-  "README.md": string;
-  "package.json": string;
-}
-
 export const createDefaultTemplate = (
   dependencies: Record<string, string>,
-): TemplateFiles => ({
+) => ({
   "index.js": "",
   "README.md": `
 # Default Template

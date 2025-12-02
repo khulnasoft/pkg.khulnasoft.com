@@ -36,9 +36,9 @@ declare global {
   }
 }
 
-// npm i https://pkg.sb.dev/dai-shi/waku/feature-a/54a65813/waku # stackblitz
-// npm i https://pkg.sb.dev/dai-shi/waku/feature-a/waku # stackblitz
-// npm i https://pkg.sb.dev/{GITHUB_REPOSITORY}/{GITHUB_REF_NAME}/{GITHUB_SHA}/{published-package} # stackblitz
-// npm i https://pkg.sb.dev/54a6581354a65813 # short-form stackblitz
+// npm i https://pkg.sb.dev/dai-shi/waku/feature-a/54a65813/waku # khulnasoft
+// npm i https://pkg.sb.dev/dai-shi/waku/feature-a/waku # khulnasoft
+// npm i https://pkg.sb.dev/{GITHUB_REPOSITORY}/{GITHUB_REF_NAME}/{GITHUB_SHA}/{published-package} # khulnasoft
+// npm i https://pkg.sb.dev/54a6581354a65813 # short-form khulnasoft
 
 export {};

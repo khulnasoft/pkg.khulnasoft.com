@@ -21,14 +21,8 @@ import "./environments";
 import { isBinaryFile } from "isbinaryfile";
 import { writePackageJSON, type PackageJson } from "pkg-types";
 import pkg from "./package.json" with { type: "json" };
-import { createDefaultTemplate, type TemplateFiles } from "./template";
+import { createDefaultTemplate } from "./template";
 import * as core from "@actions/core";
-import {
-  createScopedLogger,
-  exitWithError,
-} from "@pkg-khulnasoft/utils/logger";
-
-const logger = createScopedLogger("pkg-khulnasoft");
 
 declare global {
   const API_URL: string;
@@ -55,7 +49,7 @@ const completeMultipart = new URL("/multipart/complete", apiUrl);
 const main = defineCommand({
   meta: {
     version: pkg.version,
-    name: "stackblitz",
+    name: "khulnasoft",
     description: "A CLI for pkg.khulnasoft.com (Continuous Releases)",
   },
   subCommands: {
@@ -88,7 +82,7 @@ const main = defineCommand({
           template: {
             type: "string",
             description:
-              "generate stackblitz templates out of directories in the current repo with the new built packages",
+              "generate khulnasoft templates out of directories in the current repo with the new built packages",
           },
           comment: {
             type: "string", // "off", "create", "update" (default)
@@ -97,7 +91,7 @@ const main = defineCommand({
           },
           "only-templates": {
             type: "boolean",
-            description: `generate only stackblitz templates`,
+            description: `generate only khulnasoft templates`,
             default: false,
           },
           json: {
@@ -150,24 +144,31 @@ const main = defineCommand({
           const isOnlyTemplates = !!args["only-templates"];
           const isBinaryApplication = !!args.bin;
           const comment: Comment = args.comment as Comment;
-          const selectedPackageManager = args.packageManager as
-            | "npm"
-            | "bun"
-            | "pnpm"
-            | "yarn";
+          const selectedPackageManager = (args.packageManager as string)
+            .split(",")
+            .filter((s) => s.trim()) as Array<"npm" | "bun" | "pnpm" | "yarn">;
+          const packageManagers = ["npm", "bun", "pnpm", "yarn"];
 
-          if (
-            !["npm", "bun", "pnpm", "yarn"].includes(selectedPackageManager)
-          ) {
-            exitWithError(
-              `Unsupported package manager: ${selectedPackageManager}. Supported managers are npm, bun, pnpm, yarn.`,
+          if (!selectedPackageManager.length) {
+            console.error(
+              `Unsupported package manager: ${args.packageManager}. Supported managers are npm, bun, pnpm, yarn.`,
             );
+            process.exit(1);
+          }
+          for (let i = 0; i < selectedPackageManager.length; i++) {
+            if (!packageManagers.includes(selectedPackageManager[i])) {
+              console.error(
+                `Unsupported package manager: ${selectedPackageManager[i]}. Supported managers are npm, bun, pnpm, yarn.`,
+              );
+              process.exit(1);
+            }
           }
 
           if (!process.env.TEST && process.env.GITHUB_ACTIONS !== "true") {
-            exitWithError(
+            console.error(
               "Continuous Releases are only available in GitHub Actions.",
             );
+            process.exit(1);
           }
 
           const {
@@ -190,21 +191,27 @@ const main = defineCommand({
 
           const key = hash(metadata);
 
-          const checkResponse = await fetch(new URL("/check", apiUrl), {
-            method: "POST",
-            body: JSON.stringify({
-              owner,
-              repo,
-              key,
-            }),
-          });
+          let checkResponse;
+          try {
+            checkResponse = await fetch(new URL("/check", apiUrl), {
+              method: "POST",
+              body: JSON.stringify({
+                owner,
+                repo,
+                key,
+              }),
+            });
+          } catch (error) {
+            console.error(`Failed to connect to server: ${error}`);
+            process.exit(1);
+          }
 
           if (!checkResponse.ok) {
             const errorText = await checkResponse.text();
-            logger.error("Failed to check repository status:", errorText);
-            exitWithError(
-              "Failed to check repository status. See logs for details.",
+            console.error(
+              `Check failed (${checkResponse.status}): ${errorText}`,
             );
+            process.exit(1);
           }
 
           const { sha } = await checkResponse.json();
@@ -249,12 +256,26 @@ const main = defineCommand({
             realDeps?.set(pJson.name, pJson.version ?? longDepUrl);
 
             const controller = new AbortController();
-            const resource = await fetch(longDepUrl, {
-              signal: controller.signal,
-            });
-            if (resource.ok) {
-              logger.warn(
-                `${pJson.name}@${formattedSha} was already published on ${longDepUrl}`,
+            try {
+              const resource = await fetch(longDepUrl, {
+                signal: controller.signal,
+              });
+              if (resource.ok) {
+                console.warn(
+                  `${pJson.name}@${formattedSha} was already published on ${longDepUrl}`,
+                );
+              } else if (resource.status >= 500) {
+                console.warn(
+                  `Server error checking ${longDepUrl} (${resource.status}), proceeding with publish`,
+                );
+              } else {
+                console.warn(
+                  `Unexpected response checking ${longDepUrl} (${resource.status})`,
+                );
+              }
+            } catch (error) {
+              console.warn(
+                `Failed to check if package exists at ${longDepUrl}: ${error}`,
               );
             }
             controller.abort();
@@ -279,8 +300,8 @@ const main = defineCommand({
               : null;
 
             if (!pJson || !pJsonContents) {
-              logger.warn(
-                `Skipping ${templateDir} because there's no package.json file`,
+              console.warn(
+                `skipping ${templateDir} because there's no package.json file`,
               );
               continue;
             }
@@ -289,7 +310,7 @@ const main = defineCommand({
               throw new Error(`"name" field in ${pJsonPath} should be defined`);
             }
 
-            logger.info(`Preparing template: ${pJson.name}`);
+            console.warn("preparing template:", pJson.name);
 
             const restore = await writeDeps(
               templateDir,
@@ -347,21 +368,11 @@ const main = defineCommand({
               Object.fromEntries(deps.entries()),
             );
 
-            // Explicitly type the file paths we know exist
-            const templateFiles: Array<keyof typeof project> = [
-              "index.js",
-              "README.md",
-              "package.json",
-            ];
-
-            for (const filePath of templateFiles) {
-              const content = project[filePath];
-              if (content !== undefined) {
-                formData.append(
-                  `template:default:${encodeURIComponent(filePath)}`,
-                  content,
-                );
-              }
+            for (const filePath of Object.keys(project)) {
+              formData.append(
+                `template:default:${encodeURIComponent(filePath)}`,
+                project[filePath],
+              );
             }
           }
 
@@ -395,7 +406,9 @@ const main = defineCommand({
             const pJsonPath = path.resolve(p, "package.json");
             const pJson = await readPackageJson(pJsonPath);
             if (!pJson) {
-              logger.warn(`Skipping ${p} because there's no package.json file`);
+              console.warn(
+                `skipping ${p} because there's no package.json file`,
+              );
               continue;
             }
 
@@ -406,7 +419,7 @@ const main = defineCommand({
                 );
               }
               if (pJson.private) {
-                logger.warn(`Skipping ${p} because the package is private`);
+                console.warn(`skipping ${p} because the package is private`);
                 continue;
               }
 
@@ -460,8 +473,7 @@ const main = defineCommand({
                   },
                 });
                 if (!createMultipartRes.ok) {
-                  const errorText = await createMultipartRes.text();
-                  logger.error("Failed to create multipart upload:", errorText);
+                  console.error(await createMultipartRes.text());
                   continue;
                 }
                 const { key: uploadKey, id: uploadId } =
@@ -489,8 +501,9 @@ const main = defineCommand({
                   });
 
                   if (!uploadMultipartRes.ok) {
-                    const errorText = await uploadMultipartRes.text();
-                    logger.error(`Error uploading part ${i + 1}: ${errorText}`);
+                    console.error(
+                      `Error uploading part ${i + 1}: ${await uploadMultipartRes.text()}`,
+                    );
                     break;
                   }
                   const { part } = await uploadMultipartRes.json();
@@ -505,8 +518,9 @@ const main = defineCommand({
                   },
                 });
                 if (!completeMultipartRes.ok) {
-                  const errorText = await completeMultipartRes.text();
-                  logger.error(`Error completing upload ${key}: ${errorText}`);
+                  console.error(
+                    `Error completing ${key}: ${await completeMultipartRes.text()}`,
+                  );
                   break;
                 }
                 const { key: completionKey } =
@@ -526,17 +540,26 @@ const main = defineCommand({
               "sb-shasums": JSON.stringify(shasums),
               "sb-run-id": GITHUB_RUN_ID,
               "sb-bin": `${isBinaryApplication}`,
-              "sb-package-manager": selectedPackageManager,
+              "sb-package-manager": selectedPackageManager.join(","),
               "sb-only-templates": `${isOnlyTemplates}`,
             },
             body: formData,
           });
-          const laterRes = await res.clone().json();
-          assert.equal(
-            res.status,
-            200,
-            `publishing failed: ${await res.text()}`,
-          );
+
+          if (!res.ok) {
+            const errorText = await res.text();
+            console.error(`Publishing failed (${res.status}): ${errorText}`);
+            process.exit(1);
+          }
+
+          let laterRes;
+          try {
+            laterRes = await res.json();
+          } catch (error) {
+            console.error(`Failed to parse server response as JSON: ${error}`);
+            console.error(`Raw response: ${await res.text()}`);
+            process.exit(1);
+          }
 
           const debug = laterRes.debug;
 
@@ -544,8 +567,8 @@ const main = defineCommand({
           core.notice(JSON.stringify(debug, null, 2));
           core.endGroup();
 
-          logger.info("\n");
-          logger.info("⚡️ Your npm packages are published.\n");
+          console.warn("\n");
+          console.warn("⚡️ Your npm packages are published.\n");
 
           const packageLogs = [...formData.keys()]
             .filter((k) => k.startsWith("package:"))
@@ -560,19 +583,18 @@ const main = defineCommand({
 - sha: ${shasums[packageName]}
 - publint: ${publintUrl}
 - ${packMethod}: ${installCommands[packMethod]} ${url}`;
-            });
+            })
+            .join("\n\n");
 
-          // Log each package's information separately for better formatting
-          packageLogs.forEach((log) => logger.info(`\n${log}`));
+          console.warn(packageLogs);
 
           const output = JSON.stringify(outputMetadata, null, 2);
           if (printJson) {
-            // Use process.stdout directly for JSON output to support piping
-            process.stdout.write(output + "\n");
+            console.log(output); // Log output for piping
           }
           if (saveJson) {
             await fs.writeFile(jsonFilePath, output);
-            logger.info(`Metadata written to ${jsonFilePath}`);
+            console.warn(`metadata written to ${jsonFilePath}`);
           }
 
           await fs.appendFile(GITHUB_OUTPUT, `sha=${formattedSha}\n`, "utf8");
