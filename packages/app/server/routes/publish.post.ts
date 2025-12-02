@@ -360,7 +360,6 @@ export default eventHandler(async (event) => {
         error: true,
         message,
         stack,
-        originalError: error,
         type: "publish_error",
       },
     });
