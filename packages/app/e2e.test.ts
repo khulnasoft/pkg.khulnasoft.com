@@ -19,13 +19,13 @@ beforeAll(async () => {
       organizations: [
         { login: "khulnasoft" },
         { login: "tinylibs" },
-        { login: "stackblitz" },
+        { login: "khulnasoft" },
       ],
       repositories: [
         { owner: "khulnasoft", name: "temporary-test" },
         { owner: "khulnasoft", name: "pkg.khulnasoft.com" },
         { owner: "tinylibs", name: "tinybench" },
-        { owner: "stackblitz", name: "sdk" },
+        { owner: "khulnasoft", name: "sdk" },
       ],
       branches: [{ name: "main" }],
       blobs: [],
@@ -217,17 +217,17 @@ describe("URL redirects", () => {
   });
 
   describe("scoped packages", () => {
-    const expectedPath = `/stackblitz/sdk/${encodeURIComponent("@stackblitz/sdk")}@a832a55`;
+    const expectedPath = `/khulnasoft/sdk/${encodeURIComponent("@khulnasoft/sdk")}@a832a55`;
 
     it("redirects full scoped package URLs correctly", async () => {
       const response = await fetchWithRedirect(
-        "/stackblitz/sdk/@stackblitz/sdk@a832a55",
+        "/khulnasoft/sdk/@khulnasoft/sdk@a832a55",
       );
       expect(response.url).toContain(expectedPath);
     });
 
     it("redirects compact scoped package URLs correctly", async () => {
-      const response = await fetchWithRedirect("/@stackblitz/sdk@a832a55");
+      const response = await fetchWithRedirect("/@khulnasoft/sdk@a832a55");
       expect(response.url).toContain(expectedPath);
     });
   });

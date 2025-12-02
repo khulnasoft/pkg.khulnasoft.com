@@ -6,7 +6,7 @@ export function generateTemplateHtml(
 <head></head>
 <body>
 
-<form id="mainForm" method="post" action="https://stackblitz.com/run" target="_self">
+<form id="mainForm" method="post" action="https://khulnasoft.com/run" target="_self">
 ${Object.entries(files)
   .map(
     ([file, contentOrUrl]) =>

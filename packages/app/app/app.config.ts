@@ -4,9 +4,4 @@ export default defineAppConfig({
       primary: "sky",
     },
   },
-  // Configure the icon module
-  icon: {
-    mode: 'css',
-    cssLayer: 'base',
-  },
 });

@@ -1,8 +1,8 @@
 <p align="center"><img src="https://github.com/user-attachments/assets/314d5112-f67f-4758-82bf-7b0c19c01ba6" /></p>
 
-**[Cloudflare is now backing pkg.khulnasoft.com's data infrastructure!](https://blog.stackblitz.com/posts/cloudflare-backing-pkg-khulnasoft-data-infrastructure/)**
+**[Cloudflare is now backing pkg.khulnasoft.com's data infrastructure!](https://blog.khulnasoft.com/posts/cloudflare-backing-pkg-khulnasoft-data-infrastructure/)**
 
-# pkg.khulnasoft.com <span><img src="https://emoji.slack-edge.com/TFHDVN56F/stackblitz/fd010078dcccebca.png" width="30" /></span>
+# pkg.khulnasoft.com <span><img src="https://emoji.slack-edge.com/TFHDVN56F/khulnasoft/fd010078dcccebca.png" width="30" /></span>
 
 > We call it "Continuous Releases" too.
 
@@ -67,7 +67,7 @@ These are some of the projects and companies using pkg.khulnasoft.com:
   <a href="https://reka-ui.com/"><img src="https://reka-ui.com/logo.svg" height="40"></a>
   <a href="https://www.gradio.app/"><img src="https://www.gradio.app/_app/immutable/assets/gradio.CHB5adID.svg" height="40"></a>
   <a href="https://clockworklabs.io/"><img src="https://github.com/user-attachments/assets/85d42291-6676-4592-b6a0-ee4b6350dc47" height="40"></a>
-  <a href="https://valtio.pmnd.rs/"><img src="https://blog.stackblitz.com/posts/pkg-khulnasoft/valtio.svg" height="40"></a>
+  <a href="https://valtio.pmnd.rs/"><img src="https://blog.khulnasoft.com/posts/pkg-khulnasoft/valtio.svg" height="40"></a>
   <a href="https://github.com/nksaraf/vinxi"><img src="https://github.com/nksaraf/vinxi/raw/main/docs/public/logo.png" height="40"></a>
   <a href="https://github.com/scalar/scalar"><img src="https://github.com/scalar.png" height="40"></a>
   <a href="https://tresjs.org/"><img src="https://avatars.githubusercontent.com/u/119253150?s=200&v=4" height="40"></a>
@@ -103,7 +103,7 @@ These are some of the projects and companies using pkg.khulnasoft.com:
    <a href="https://svelte.dev"><img src="https://svelte.dev/favicon.png" height="40" /></a>
    <a href="https://trpc.io"><img src="https://trpc.io/img/logo.svg" height="40" /></a>
    <a href="https://kysely.dev"><img src="https://kysely.dev/img/logo.svg" height="40" /></a>
-   <a href="https://tutorialkit.dev/"><img src="https://raw.githubusercontent.com/stackblitz/tutorialkit/refs/tags/1.3.0/extensions/vscode/resources/tutorialkit-icon.png" height="40" /></a>
+   <a href="https://tutorialkit.dev/"><img src="https://raw.githubusercontent.com/khulnasoft/tutorialkit/refs/tags/1.3.0/extensions/vscode/resources/tutorialkit-icon.png" height="40" /></a>
    <a href="https://heyapi.dev"><img src="https://heyapi.dev/images/logo-300w.png" height="40" /></a>
    <a href="https://github.com/ant-design"><img src="https://github.com/ant-design.png" height="40" /></a>
    <a href="https://typeorm.io"><img src="https://github.com/typeorm/typeorm/blob/master/resources/typeorm-logo-colored-light.png" height="40" /></a>
@@ -113,7 +113,7 @@ These are some of the projects and companies using pkg.khulnasoft.com:
 
 Feel free to add your project or company here to join the pkg.khulnasoft.com family :)
 
-You can also join our discord server [here](https://discord.gg/stackblitz), so we all have fun together!
+You can also join our discord server [here](https://discord.gg/khulnasoft), so we all have fun together!
 
 ## Setup
 
@@ -198,7 +198,7 @@ With `--comment=create`, each commit would generate a comment for itself, useful
 
 And `--comment=off` would turn off comments for maintainers who prefer minimal pull requests.
 
-To customize which package manager is reflected in the comments, use the `--packageManager=XYZ` flag. XYZ can be one of the following: npm (default), pnpm, yarn, or bun.
+To customize which package manager is reflected in the comments, use the `--packageManager=XYZ` flag. XYZ can be one of the following: npm (default), pnpm, yarn, or bun. Multiple valid values ​​can also be configured at the same time, such as `--packageManager=ABC,XYZ`.
 
 For repositories with many packages, comments might get too long. In that case, you can use `--only-templates` to only show templates.
 

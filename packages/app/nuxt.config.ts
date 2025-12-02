@@ -10,7 +10,7 @@ export default defineNuxtConfig({
   future: { compatibilityVersion: 4 },
 
   // https://nuxt.com/modules
-  modules: ["@nuxt/eslint", "@nuxt/ui", "@vueuse/nuxt", "nitro-cloudflare-dev", "@nuxt/icon"],
+  modules: ["@nuxt/eslint", "@nuxt/ui", "@vueuse/nuxt", "nitro-cloudflare-dev"],
 
   css: ["~/assets/css/main.css"],
 
@@ -71,6 +71,16 @@ export default defineNuxtConfig({
         route: "/~/**",
         handler: clientRenderer,
       });
+    },
+  },
+
+  icon: {
+    clientBundle: {
+      icons: ["mdi-github"],
+      // scan all components in the project and include icons
+      scan: true,
+      // guard for uncompressed bundle size, will fail the build if exceeds
+      sizeLimitKb: 256,
     },
   },
 });

@@ -5,19 +5,19 @@
     <div class="flex gap-6 items-center justify-center">
       <div class="flex items-center">
         <a
-          href="https://blog.stackblitz.com/posts/pkg-khulnasoft/"
+          href="https://blog.khulnasoft.com/posts/pkg-khulnasoft/"
           target="_blank"
           class="block"
         >
           <img
-            src="/stackblitz.svg"
+            src="/khulnasoft.svg"
             alt="StackBlitz"
             width="117"
             height="28"
             class="not-dark:hidden"
           />
           <img
-            src="/stackblitz-black.svg"
+            src="/khulnasoft-black.svg"
             alt="StackBlitz"
             width="117"
             height="28"
@@ -28,7 +28,7 @@
       <div class="text-xs opacity-70 flex items-center">+</div>
       <div class="flex items-center">
         <a
-          href="https://blog.stackblitz.com/posts/cloudflare-backing-pkg-khulnasoft-data-infrastructure/"
+          href="https://blog.khulnasoft.com/posts/cloudflare-backing-pkg-khulnasoft-data-infrastructure/"
           target="_blank"
           class="block"
         >
@@ -56,7 +56,7 @@
       <UIcon name="ph-dot" />
       <div>
         <a
-          href="https://blog.stackblitz.com/posts/cloudflare-backing-pkg-khulnasoft-data-infrastructure/"
+          href="https://blog.khulnasoft.com/posts/cloudflare-backing-pkg-khulnasoft-data-infrastructure/"
           target="_blank"
           class="text-primary"
           >Backed by Cloudflare</a

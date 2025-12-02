@@ -62,7 +62,7 @@ export default eventHandler(async (event) => {
       throw createError({
         statusCode: 413,
         message:
-          "Max payload limit is 20mb! Feel free to apply for the whitelist: https://github.com/khulnasofts/pkg.khulnasoft.com/blob/main/.whitelist",
+          "Max payload limit is 20mb! Feel free to apply for the whitelist: https://github.com/khulnasoft/pkg.khulnasoft.com/blob/main/.whitelist",
       });
     }
 
@@ -360,6 +360,7 @@ export default eventHandler(async (event) => {
         error: true,
         message,
         stack,
+        originalError: error,
         type: "publish_error",
       },
     });

@@ -9,7 +9,7 @@ export default eventHandler(async (event) => {
   const params = getRouterParams(event) as Params;
   const [packageName, refOrSha] = params.repo.split("@");
 
-  // /@stackblitz/sdk@a832a55
+  // /@khulnasoft/sdk@a832a55
   if (params.owner.startsWith("@")) {
     // it's not a short url, it's a scoped package in compact mode
     const npmOrg = params.owner;

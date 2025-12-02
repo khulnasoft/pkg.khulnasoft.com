@@ -35,7 +35,7 @@ console.log(`current webhook url: ${url}`);
 
 const newUrl = new URL(
   "/webhook",
-  process.env.API_URL ?? "https://stackblitz-cr.pages.dev/",
+  process.env.API_URL ?? "https://khulnasoft-cr.pages.dev/",
 );
 
 const result = await octokit.request({

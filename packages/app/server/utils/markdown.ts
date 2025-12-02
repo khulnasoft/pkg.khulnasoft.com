@@ -35,18 +35,22 @@ export function generateCommitPublishMessage(
         workflowData,
         compact,
       );
+      return packageManager
+        .split(",")
+        .map((pm) => {
+          if (pm === "yarn") {
+            shaUrl = `${shaUrl}.tgz`;
+          }
 
-      if (packageManager === "yarn") {
-        shaUrl = `${shaUrl}.tgz`;
-      }
+          const descriptor = `${pm === "yarn" ? `${packageName}@` : ""}${shaUrl}`;
 
-      const descriptor = `${packageManager === "yarn" ? `${packageName}@` : ""}${shaUrl}`;
-
-      return `
-\`\`\`
-${bin ? binCommands[packageManager] : installCommands[packageManager]} ${descriptor}
-\`\`\`
-      `;
+          return `
+  \`\`\`
+  ${bin ? binCommands[pm as PackageManager] : installCommands[pm as PackageManager]} ${descriptor}
+  \`\`\`
+        `;
+        })
+        .join("\n");
     })
     .map((message, i) =>
       isMoreThanFour
@@ -86,16 +90,20 @@ export function generatePullRequestPublishMessage(
         workflowData,
         compact,
       );
+      return packageManager
+        .split(",")
+        .map((pm) => {
+          if (pm === "yarn") {
+            refUrl = `${refUrl}.tgz`;
+          }
 
-      if (packageManager === "yarn") {
-        refUrl = `${refUrl}.tgz`;
-      }
-
-      return `
-\`\`\`
-${bin ? binCommands[packageManager] : installCommands[packageManager]} ${refUrl}
-\`\`\`
-`;
+          return `
+  \`\`\`
+  ${bin ? binCommands[pm as PackageManager] : installCommands[pm as PackageManager]} ${refUrl}
+  \`\`\`
+  `;
+        })
+        .join("\n");
     })
     .map((message, i) =>
       isMoreThanFour
@@ -123,9 +131,9 @@ function generateTemplatesStr(templates: Record<string, string>) {
       : "";
 
   if (entries.length > 0 && entries.length <= 2) {
-    str = [str, ...entries.map(([k, v]) => `[${k}](${v})`)]
+    str = [str, ...entries.map(([k, v]) => `- [${k}](${v})`)]
       .filter(Boolean)
-      .join(" • ");
+      .join("\n");
   } else if (entries.length > 2) {
     str += createCollapsibleBlock(
       "<b>More templates</b>",

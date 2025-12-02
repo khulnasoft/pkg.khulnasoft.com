@@ -17,7 +17,7 @@ function scrollToGettingStarted() {
   <div>
     <div class="flex justify-center pt-4 pb-2">
       <a
-        href="https://blog.stackblitz.com/posts/cloudflare-backing-pkg-khulnasoft-data-infrastructure/"
+        href="https://blog.khulnasoft.com/posts/cloudflare-backing-pkg-khulnasoft-data-infrastructure/"
         target="_blank"
         class="bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white rounded-full px-5 py-2.5 block border border-gray-200 dark:border-gray-700"
       >
