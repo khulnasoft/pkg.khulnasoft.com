@@ -23,6 +23,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@iconify-json/mdi": "^1.2.3",
     "@jsdevtools/ez-spawn": "^3.0.4",
     "@types/node": "^20.14.2",
     "@typescript-eslint/eslint-plugin": "^5.62.0",

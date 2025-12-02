@@ -20,6 +20,9 @@ importers:
         specifier: ^3.57.1
         version: 3.114.15(@cloudflare/workers-types@4.20251202.0)
     devDependencies:
+      '@iconify-json/mdi':
+        specifier: ^1.2.3
+        version: 1.2.3
       '@jsdevtools/ez-spawn':
         specifier: ^3.0.4
         version: 3.0.4
