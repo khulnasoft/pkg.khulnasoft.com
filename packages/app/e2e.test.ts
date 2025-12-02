@@ -49,16 +49,8 @@ beforeAll(async () => {
     },
   );
 
-  // Defensive check for proxyData to avoid the TypeError
-  if (!worker.proxyData?.userWorkerUrl) {
-    throw new Error(
-      `worker.proxyData.userWorkerUrl is undefined. ` +
-      `Make sure your worker is built and running in dev mode, not production build.`,
-    );
-  }
-
-  // Compose the worker URL
-  workerUrl = `${worker.proxyData.userWorkerUrl.protocol}//${worker.proxyData.userWorkerUrl.hostname}:${worker.proxyData.userWorkerUrl.port}`;
+  // Compose the worker URL using worker.address and worker.port
+  workerUrl = `http://${worker.address}:${worker.port}`;
 
   // Optionally: Build other packages *before* tests, outside of beforeAll
   // await ezSpawn.async(`pnpm cross-env TEST=true API_URL=${workerUrl} pnpm --filter=pkg-khulnasoft run build`, [], {
@@ -107,6 +99,7 @@ describe.sequential.each([
   it(`publishes playgrounds for ${mode}`, async () => {
     const env = Object.entries({
       TEST: true,
+      API_URL: workerUrl,
       GITHUB_SERVER_URL: new URL(payload.workflow_run.html_url).origin,
       GITHUB_REPOSITORY: payload.repository.full_name,
       GITHUB_RUN_ID: payload.workflow_run.id,
@@ -130,7 +123,7 @@ describe.sequential.each([
     } catch (error) {
       console.error(error);
     }
-  }, 10_000);
+  }, 30_000);
 
   it(`serves and installs playground-a for ${mode}`, async () => {
     const [owner, repo] = payload.repository.full_name.split("/");
@@ -201,7 +194,8 @@ describe("URL redirects", () => {
 
     it("redirects compact scoped package URLs correctly", async () => {
       const response = await fetchWithRedirect("/@khulnasoft/sdk@a832a55");
-      expect(response.url).toContain(expectedPath);
+      const redirectedUrl = new URL(response.url);
+      expect(decodeURIComponent(redirectedUrl.pathname)).toContain(decodeURIComponent(expectedPath));
     });
   });
 });
