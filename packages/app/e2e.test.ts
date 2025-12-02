@@ -98,6 +98,7 @@ describe.sequential.each([
   it(`publishes playgrounds for ${mode}`, async () => {
     const env = Object.entries({
       TEST: true,
+      API_URL: workerUrl,
       GITHUB_SERVER_URL: new URL(payload.workflow_run.html_url).origin,
       GITHUB_REPOSITORY: payload.repository.full_name,
       GITHUB_RUN_ID: payload.workflow_run.id,
@@ -131,7 +132,6 @@ describe.sequential.each([
     const [owner, repo] = payload.repository.full_name.split("/");
     const sha = payload.workflow_run.head_sha.substring(0, 7);
     const ref = pr?.payload.number ?? payload.workflow_run.head_branch;
-
     const shaResponse = await worker.fetch(`/${owner}/${repo}/playground-a@${sha}`);
     expect(shaResponse.status).toBe(200);
     const shaBlob = await shaResponse.blob();
