@@ -1,10 +1,6 @@
 export default defineNuxtConfig({
-  sourcemap: true,
 
-  compatibilityDate: "2024-07-30",
-  future: {
-    compatibilityVersion: 4,
-  },
+
 
   modules: [
     "@nuxt/eslint",
@@ -13,7 +9,7 @@ export default defineNuxtConfig({
     "nitro-cloudflare-dev",
   ],
 
-  css: ["~/assets/css/main.css"],
+  css: ["~/app/assets/css/main.css"],
 
   eslint: {
     config: {
@@ -21,28 +17,23 @@ export default defineNuxtConfig({
     },
   },
 
-  devtools: { enabled: true },
+  devtools: { enabled: false }, // Changed from true to false to reduce memory usage during build.
 
-  nitro: {
-    preset: "cloudflare-pages",
-    sourceMap: "inline",
-    compatibilityDate: "2024-09-19",
-    externals: {
-      inline: [
-        "@octokit",
-        "@vue",
-        "vue",
-        "@tanstack",
-        "@vueuse",
-        "@iconify",
-        "@nuxt",
-        "nuxt",
-        "query-registry",
-        "@simulacrum",
-        "@jsdevtools",
-      ],
-    },
-  },
+      nitro: {
+
+        preset: "node_server",
+
+        // sourceMap: "inline", // Commented out to reduce memory usage during build.
+
+        compatibilityDate: "2024-09-19",
+
+        externals: {
+          inline: [
+            "@octokit",
+          ],
+        },
+
+      },
 
   runtimeConfig: {
     nitro: { envPrefix: "NITRO_" },
@@ -60,7 +51,7 @@ export default defineNuxtConfig({
     clientBundle: {
       icons: ["mdi:github"],
       collections: ["mdi"],
-      scan: true,
+      scan: false, // Changed from true to false to reduce memory usage during build.
       sizeLimitKb: 256,
     },
   },

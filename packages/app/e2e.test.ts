@@ -43,7 +43,7 @@ beforeAll(async () => {
 
   // Launch worker in dev mode (ensure build output exists before this)
   worker = await unstable_dev(
-    `${import.meta.dirname}/dist/_worker.js/index.js`,
+    `${import.meta.dirname}/.output/server/index.mjs`,
     {
       config: `${import.meta.dirname}/wrangler.toml`,
     },
@@ -51,6 +51,7 @@ beforeAll(async () => {
 
   // Compose the worker URL using worker.address and worker.port
   workerUrl = `http://${worker.address}:${worker.port}`;
+  console.log(`Worker URL: ${workerUrl}`);
 
   // Optionally: Build other packages *before* tests, outside of beforeAll
   // await ezSpawn.async(`pnpm cross-env TEST=true API_URL=${workerUrl} pnpm --filter=pkg-khulnasoft run build`, [], {
