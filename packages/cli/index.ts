@@ -13,6 +13,7 @@ import {
   abbreviateCommitHash,
   extractOwnerAndRepo,
   extractRepository,
+  installCommands,
 } from "@pkg-khulnasoft/utils";
 import { glob } from "tinyglobby";
 import ignore from "ignore";
@@ -20,8 +21,14 @@ import "./environments";
 import { isBinaryFile } from "isbinaryfile";
 import { writePackageJSON, type PackageJson } from "pkg-types";
 import pkg from "./package.json" with { type: "json" };
-import { createDefaultTemplate } from "./template";
+import { createDefaultTemplate, type TemplateFiles } from "./template";
 import * as core from "@actions/core";
+import {
+  createScopedLogger,
+  exitWithError,
+} from "@pkg-khulnasoft/utils/logger";
+
+const logger = createScopedLogger("pkg-khulnasoft");
 
 declare global {
   const API_URL: string;
@@ -152,17 +159,15 @@ const main = defineCommand({
           if (
             !["npm", "bun", "pnpm", "yarn"].includes(selectedPackageManager)
           ) {
-            console.error(
+            exitWithError(
               `Unsupported package manager: ${selectedPackageManager}. Supported managers are npm, bun, pnpm, yarn.`,
             );
-            process.exit(1);
           }
 
           if (!process.env.TEST && process.env.GITHUB_ACTIONS !== "true") {
-            console.error(
+            exitWithError(
               "Continuous Releases are only available in GitHub Actions.",
             );
-            process.exit(1);
           }
 
           const {
@@ -195,8 +200,11 @@ const main = defineCommand({
           });
 
           if (!checkResponse.ok) {
-            console.error(await checkResponse.text());
-            process.exit(1);
+            const errorText = await checkResponse.text();
+            logger.error("Failed to check repository status:", errorText);
+            exitWithError(
+              "Failed to check repository status. See logs for details.",
+            );
           }
 
           const { sha } = await checkResponse.json();
@@ -245,7 +253,7 @@ const main = defineCommand({
               signal: controller.signal,
             });
             if (resource.ok) {
-              console.warn(
+              logger.warn(
                 `${pJson.name}@${formattedSha} was already published on ${longDepUrl}`,
               );
             }
@@ -271,8 +279,8 @@ const main = defineCommand({
               : null;
 
             if (!pJson || !pJsonContents) {
-              console.warn(
-                `skipping ${templateDir} because there's no package.json file`,
+              logger.warn(
+                `Skipping ${templateDir} because there's no package.json file`,
               );
               continue;
             }
@@ -281,7 +289,7 @@ const main = defineCommand({
               throw new Error(`"name" field in ${pJsonPath} should be defined`);
             }
 
-            console.warn("preparing template:", pJson.name);
+            logger.info(`Preparing template: ${pJson.name}`);
 
             const restore = await writeDeps(
               templateDir,
@@ -339,11 +347,21 @@ const main = defineCommand({
               Object.fromEntries(deps.entries()),
             );
 
-            for (const filePath of Object.keys(project)) {
-              formData.append(
-                `template:default:${encodeURIComponent(filePath)}`,
-                project[filePath],
-              );
+            // Explicitly type the file paths we know exist
+            const templateFiles: Array<keyof typeof project> = [
+              "index.js",
+              "README.md",
+              "package.json",
+            ];
+
+            for (const filePath of templateFiles) {
+              const content = project[filePath];
+              if (content !== undefined) {
+                formData.append(
+                  `template:default:${encodeURIComponent(filePath)}`,
+                  content,
+                );
+              }
             }
           }
 
@@ -377,9 +395,7 @@ const main = defineCommand({
             const pJsonPath = path.resolve(p, "package.json");
             const pJson = await readPackageJson(pJsonPath);
             if (!pJson) {
-              console.warn(
-                `skipping ${p} because there's no package.json file`,
-              );
+              logger.warn(`Skipping ${p} because there's no package.json file`);
               continue;
             }
 
@@ -390,7 +406,7 @@ const main = defineCommand({
                 );
               }
               if (pJson.private) {
-                console.warn(`skipping ${p} because the package is private`);
+                logger.warn(`Skipping ${p} because the package is private`);
                 continue;
               }
 
@@ -444,7 +460,8 @@ const main = defineCommand({
                   },
                 });
                 if (!createMultipartRes.ok) {
-                  console.error(await createMultipartRes.text());
+                  const errorText = await createMultipartRes.text();
+                  logger.error("Failed to create multipart upload:", errorText);
                   continue;
                 }
                 const { key: uploadKey, id: uploadId } =
@@ -472,9 +489,8 @@ const main = defineCommand({
                   });
 
                   if (!uploadMultipartRes.ok) {
-                    console.error(
-                      `Error uploading part ${i + 1}: ${await uploadMultipartRes.text()}`,
-                    );
+                    const errorText = await uploadMultipartRes.text();
+                    logger.error(`Error uploading part ${i + 1}: ${errorText}`);
                     break;
                   }
                   const { part } = await uploadMultipartRes.json();
@@ -489,9 +505,8 @@ const main = defineCommand({
                   },
                 });
                 if (!completeMultipartRes.ok) {
-                  console.error(
-                    `Error completing ${key}: ${await completeMultipartRes.text()}`,
-                  );
+                  const errorText = await completeMultipartRes.text();
+                  logger.error(`Error completing upload ${key}: ${errorText}`);
                   break;
                 }
                 const { key: completionKey } =
@@ -529,8 +544,8 @@ const main = defineCommand({
           core.notice(JSON.stringify(debug, null, 2));
           core.endGroup();
 
-          console.warn("\n");
-          console.warn("⚡️ Your npm packages are published.\n");
+          logger.info("\n");
+          logger.info("⚡️ Your npm packages are published.\n");
 
           const packageLogs = [...formData.keys()]
             .filter((k) => k.startsWith("package:"))
@@ -544,19 +559,20 @@ const main = defineCommand({
               return `${packageName}:
 - sha: ${shasums[packageName]}
 - publint: ${publintUrl}
-- npm: npm i ${url}`;
-            })
-            .join("\n\n");
+- ${packMethod}: ${installCommands[packMethod]} ${url}`;
+            });
 
-          console.warn(packageLogs);
+          // Log each package's information separately for better formatting
+          packageLogs.forEach((log) => logger.info(`\n${log}`));
 
           const output = JSON.stringify(outputMetadata, null, 2);
           if (printJson) {
-            console.log(output); // Log output for piping
+            // Use process.stdout directly for JSON output to support piping
+            process.stdout.write(output + "\n");
           }
           if (saveJson) {
             await fs.writeFile(jsonFilePath, output);
-            console.warn(`metadata written to ${jsonFilePath}`);
+            logger.info(`Metadata written to ${jsonFilePath}`);
           }
 
           await fs.appendFile(GITHUB_OUTPUT, `sha=${formattedSha}\n`, "utf8");

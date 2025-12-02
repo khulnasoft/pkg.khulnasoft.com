@@ -1,4 +1,4 @@
-// import ncb from "nitro-cloudflare-dev",
+// import ncb from "nitro-cloudflare-dev";
 import { resolve } from "pathe";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -10,16 +10,11 @@ export default defineNuxtConfig({
   future: { compatibilityVersion: 4 },
 
   // https://nuxt.com/modules
-  modules: [
-    "@nuxt/eslint",
-    "@vueuse/nuxt",
-    "nitro-cloudflare-dev",
-  ],
+  modules: ["@nuxt/eslint", "@nuxt/ui", "@vueuse/nuxt", "nitro-cloudflare-dev", "@nuxt/icon"],
 
-  // Disable all network-dependent features
   css: ["~/assets/css/main.css"],
-  ssr: true,
 
+  // https://eslint.nuxt.com
   eslint: {
     config: {
       standalone: false,
@@ -78,6 +73,4 @@ export default defineNuxtConfig({
       });
     },
   },
-
-  // Simplified configuration to avoid network issues
 });
