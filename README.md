@@ -2,7 +2,6 @@
   <img src="https://img.shields.io/badge/status-active-brightgreen?style=for-the-badge&logo=rocket" alt="Active Status" />
 </p>
 
-
 ---
 
 ### 2. 📑 Table of Contents (Clickable Links for Easy Navigation)
@@ -40,25 +39,25 @@ Using `<details>` keeps your README clean while allowing users to explore advanc
   npx pkg-khulnasoft publish './packages/A' './packages/B'
 ````
 
-* Use templates (experimental):
+- Use templates (experimental):
 
 ```bash
 npx pkg-khulnasoft publish './packages/A' --template './examples/*'
 ```
 
-* Enable compact URLs (requires valid published npm package with correct `repository` field):
+- Enable compact URLs (requires valid published npm package with correct `repository` field):
 
 ```bash
 npx pkg-khulnasoft publish --compact './packages/A' './packages/B'
 ```
 
-* Publish CLI apps with `npx` usage:
+- Publish CLI apps with `npx` usage:
 
 ```bash
 npx pkg-khulnasoft publish --bin
 ```
 
-* Control comments on PRs:
+- Control comments on PRs:
 
 ```bash
 npx pkg-khulnasoft publish --comment=update
@@ -66,7 +65,7 @@ npx pkg-khulnasoft publish --comment=create
 npx pkg-khulnasoft publish --comment=off
 ```
 
-* Customize package managers in comments:
+- Customize package managers in comments:
 
 ```bash
 npx pkg-khulnasoft publish --packageManager=pnpm,yarn

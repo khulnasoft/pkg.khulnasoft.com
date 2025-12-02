@@ -1,13 +1,5 @@
 export default defineNuxtConfig({
-
-
-
-  modules: [
-    "@nuxt/eslint",
-    "@nuxt/ui",
-    "@vueuse/nuxt",
-    "nitro-cloudflare-dev",
-  ],
+  modules: ["@nuxt/eslint", "@nuxt/ui", "@vueuse/nuxt", "nitro-cloudflare-dev"],
 
   css: ["~/app/assets/css/main.css"],
 
@@ -19,21 +11,17 @@ export default defineNuxtConfig({
 
   devtools: { enabled: false }, // Changed from true to false to reduce memory usage during build.
 
-      nitro: {
+  nitro: {
+    preset: "node_server",
 
-        preset: "node_server",
+    // sourceMap: "inline", // Commented out to reduce memory usage during build.
 
-        // sourceMap: "inline", // Commented out to reduce memory usage during build.
+    compatibilityDate: "2024-09-19",
 
-        compatibilityDate: "2024-09-19",
-
-        externals: {
-          inline: [
-            "@octokit",
-          ],
-        },
-
-      },
+    externals: {
+      inline: ["@octokit"],
+    },
+  },
 
   runtimeConfig: {
     nitro: { envPrefix: "NITRO_" },

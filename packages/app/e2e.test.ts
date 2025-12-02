@@ -109,7 +109,9 @@ describe.sequential.each([
       GITHUB_SHA: payload.workflow_run.head_sha,
       GITHUB_ACTION: payload.workflow_run.id,
       GITHUB_JOB: payload.workflow_run.name,
-      GITHUB_REF_NAME: pr ? `${pr.payload.number}/merge` : payload.workflow_run.head_branch,
+      GITHUB_REF_NAME: pr
+        ? `${pr.payload.number}/merge`
+        : payload.workflow_run.head_branch,
     })
       .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
       .join(" ");
@@ -131,44 +133,64 @@ describe.sequential.each([
     const sha = payload.workflow_run.head_sha.substring(0, 7);
     const ref = pr?.payload.number ?? payload.workflow_run.head_branch;
 
-    const shaResponse = await worker.fetch(`/${owner}/${repo}/playground-a@${sha}`);
+    const shaResponse = await worker.fetch(
+      `/${owner}/${repo}/playground-a@${sha}`,
+    );
     expect(shaResponse.status).toBe(200);
     const shaBlob = await shaResponse.blob();
     expect(shaBlob.size).toBeGreaterThan(0);
 
-    const refResponse = await fetchWithRedirect(`/${owner}/${repo}/playground-a@${ref}`);
+    const refResponse = await fetchWithRedirect(
+      `/${owner}/${repo}/playground-a@${ref}`,
+    );
     const refBlob = await refResponse.blob();
 
     const shaBlobBuffer = await shaBlob.arrayBuffer();
     const refBlobBuffer = await refBlob.arrayBuffer();
 
     expect(shaBlobBuffer.byteLength).toEqual(refBlobBuffer.byteLength);
-    expect(new Uint8Array(shaBlobBuffer)).toEqual(new Uint8Array(refBlobBuffer));
+    expect(new Uint8Array(shaBlobBuffer)).toEqual(
+      new Uint8Array(refBlobBuffer),
+    );
 
-    const url = new URL(`/${owner}/${repo}/playground-a@${sha}?id=${Date.now()}`, workerUrl);
+    const url = new URL(
+      `/${owner}/${repo}/playground-a@${sha}?id=${Date.now()}`,
+      workerUrl,
+    );
     const installProcess = await ezSpawn.async(
       `pnpm cross-env CI=true npx -f playground-a@${url}`,
       { stdio: "overlapped", shell: true },
     );
-    expect(installProcess.stdout).toContain("playground-a installed successfully!");
+    expect(installProcess.stdout).toContain(
+      "playground-a installed successfully!",
+    );
   }, 10_000);
 
   it(`serves and installs playground-b for ${mode}`, async () => {
     const [owner, repo] = payload.repository.full_name.split("/");
     const sha = payload.workflow_run.head_sha.substring(0, 7);
 
-    const response = await worker.fetch(`/${owner}/${repo}/playground-b@${sha}`);
+    const response = await worker.fetch(
+      `/${owner}/${repo}/playground-b@${sha}`,
+    );
     expect(response.status).toBe(200);
     const blob = await response.blob();
     expect(blob.size).toBeGreaterThan(0);
 
-    const url = new URL(`/${owner}/${repo}/playground-b@${sha}?id=${Date.now()}`, workerUrl);
+    const url = new URL(
+      `/${owner}/${repo}/playground-b@${sha}?id=${Date.now()}`,
+      workerUrl,
+    );
     const installProcess = await ezSpawn.async(
       `pnpm cross-env CI=true npx -f playground-b@${url}`,
       { stdio: "overlapped", shell: true },
     );
-    expect(installProcess.stdout).toContain("playground-a installed successfully!"); // imports playground-a
-    expect(installProcess.stdout).toContain("playground-b installed successfully!");
+    expect(installProcess.stdout).toContain(
+      "playground-a installed successfully!",
+    ); // imports playground-a
+    expect(installProcess.stdout).toContain(
+      "playground-b installed successfully!",
+    );
   }, 10_000);
 });
 
@@ -189,19 +211,26 @@ describe("URL redirects", () => {
     const expectedPath = `/khulnasoft/sdk/${encodeURIComponent("@khulnasoft/sdk")}@a832a55`;
 
     it("redirects full scoped package URLs correctly", async () => {
-      const response = await fetchWithRedirect("/khulnasoft/sdk/@khulnasoft/sdk@a832a55");
+      const response = await fetchWithRedirect(
+        "/khulnasoft/sdk/@khulnasoft/sdk@a832a55",
+      );
       expect(response.url).toContain(expectedPath);
     });
 
     it("redirects compact scoped package URLs correctly", async () => {
       const response = await fetchWithRedirect("/@khulnasoft/sdk@a832a55");
       const redirectedUrl = new URL(response.url);
-      expect(decodeURIComponent(redirectedUrl.pathname)).toContain(decodeURIComponent(expectedPath));
+      expect(decodeURIComponent(redirectedUrl.pathname)).toContain(
+        decodeURIComponent(expectedPath),
+      );
     });
   });
 });
 
-async function fetchWithRedirect(url: string, maxRedirects = 999): Promise<Response> {
+async function fetchWithRedirect(
+  url: string,
+  maxRedirects = 999,
+): Promise<Response> {
   const response = await worker.fetch(url, { redirect: "manual" });
 
   if (response.status >= 300 && response.status < 400 && maxRedirects > 0) {
