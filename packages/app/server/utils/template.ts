@@ -1,7 +1,4 @@
-export function generateTemplateHtml(
-  name: string,
-  files: Record<string, string>,
-) {
+export function generateTemplateHtml(name: string, files: Record<string, string>) {
   return `<html lang="en">
 <head></head>
 <body>

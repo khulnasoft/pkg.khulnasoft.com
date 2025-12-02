@@ -25,10 +25,7 @@ const route = useRoute();
           :icon="colorMode.preference === 'light' ? 'ph-sun' : 'ph-moon-stars'"
           color="neutral"
           variant="link"
-          @click="
-            colorMode.preference =
-              colorMode.preference === 'dark' ? 'light' : 'dark'
-          "
+          @click="colorMode.preference = colorMode.preference === 'dark' ? 'light' : 'dark'"
         />
         <template #fallback>
           <div class="w-8 h-8" />

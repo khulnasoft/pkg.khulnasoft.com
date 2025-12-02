@@ -1,10 +1,4 @@
-import {
-  defineEventHandler,
-  setHeader,
-  getRouterParams,
-  createError,
-  getQuery,
-} from "h3";
+import { defineEventHandler, setHeader, getRouterParams, createError, getQuery } from "h3";
 import { getRepoReleaseCount } from "../../../utils/bucket";
 import { LOGO_BASE64 } from "../../../../shared/constants";
 

@@ -18,10 +18,7 @@
     </GettingStartedStep>
 
     <GettingStartedStep step="2">
-      <div>
-        Then, use the following command in your workflows to create continuous
-        releases.
-      </div>
+      <div>Then, use the following command in your workflows to create continuous releases.</div>
 
       <CodeSnippet code="npx pkg-khulnasoft publish" />
 
@@ -53,9 +50,7 @@
     </GettingStartedStep>
 
     <GettingStartedStep step="4">
-      <div>
-        Promote pkg.khulnasoft.com by adding a badge to your repository README:
-      </div>
+      <div>Promote pkg.khulnasoft.com by adding a badge to your repository README:</div>
 
       <div class="w-[550px]">
         <CodeSnippet
@@ -65,8 +60,7 @@
       </div>
 
       <div class="text-gray-500 text-sm">
-        Replace OWNER and REPO with your GitHub username/organization and
-        repository name.
+        Replace OWNER and REPO with your GitHub username/organization and repository name.
       </div>
 
       <template #actions>

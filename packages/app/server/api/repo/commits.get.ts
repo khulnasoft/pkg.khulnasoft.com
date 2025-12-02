@@ -10,22 +10,13 @@ const querySchema = z.object({
 
 export default defineEventHandler(async (event) => {
   try {
-    const query = await getValidatedQuery(event, (data) =>
-      querySchema.parse(data),
-    );
-    const installation = await useOctokitInstallation(
-      event,
-      query.owner,
-      query.repo,
-    );
+    const query = await getValidatedQuery(event, (data) => querySchema.parse(data));
+    const installation = await useOctokitInstallation(event, query.owner, query.repo);
 
-    const { data: repo } = await installation.request(
-      "GET /repos/{owner}/{repo}",
-      {
-        owner: query.owner,
-        repo: query.repo,
-      },
-    );
+    const { data: repo } = await installation.request("GET /repos/{owner}/{repo}", {
+      owner: query.owner,
+      repo: query.repo,
+    });
 
     const defaultBranch = repo.default_branch;
 
@@ -36,16 +27,13 @@ export default defineEventHandler(async (event) => {
         : 1;
     const per_page = Number.parseInt(query.per_page);
 
-    const { data: commits } = await installation.request(
-      "GET /repos/{owner}/{repo}/commits",
-      {
-        owner: query.owner,
-        repo: query.repo,
-        sha: defaultBranch,
-        page,
-        per_page,
-      },
-    );
+    const { data: commits } = await installation.request("GET /repos/{owner}/{repo}/commits", {
+      owner: query.owner,
+      repo: query.repo,
+      sha: defaultBranch,
+      page,
+      per_page,
+    });
 
     const commitsWithStatuses = await Promise.all(
       commits.map(async (commit) => {
@@ -70,13 +58,9 @@ export default defineEventHandler(async (event) => {
               checkRuns.check_runs.length > 0
                 ? {
                     id: `status-${commit.sha}`,
-                    state: checkRuns.check_runs.some(
-                      (check) => check.conclusion === "failure",
-                    )
+                    state: checkRuns.check_runs.some((check) => check.conclusion === "failure")
                       ? "FAILURE"
-                      : checkRuns.check_runs.some(
-                            (check) => check.conclusion === "success",
-                          )
+                      : checkRuns.check_runs.some((check) => check.conclusion === "success")
                         ? "SUCCESS"
                         : "PENDING",
                     contexts: {
@@ -95,10 +79,7 @@ export default defineEventHandler(async (event) => {
                 : null,
           };
         } catch (error) {
-          console.warn(
-            `Could not fetch check runs for commit ${commit.sha}:`,
-            error,
-          );
+          console.warn(`Could not fetch check runs for commit ${commit.sha}:`, error);
           return {
             id: commit.node_id || commit.sha,
             oid: commit.sha,

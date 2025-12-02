@@ -1,11 +1,8 @@
 import type { PackageManifest } from "query-registry";
 
-const githubUrlRegex =
-  /^(?:git\+)?https?:\/\/github\.com\/([^/]+)\/([^/]+)\.git$/;
+const githubUrlRegex = /^(?:git\+)?https?:\/\/github\.com\/([^/]+)\/([^/]+)\.git$/;
 
-export function extractOwnerAndRepo(
-  repositoryUrl: string,
-): [string, string] | null {
+export function extractOwnerAndRepo(repositoryUrl: string): [string, string] | null {
   const match = repositoryUrl.match(githubUrlRegex);
 
   if (match) {
@@ -16,9 +13,7 @@ export function extractOwnerAndRepo(
 }
 
 export function extractRepository(manifest: PackageManifest) {
-  return typeof manifest.repository === "string"
-    ? manifest.repository
-    : manifest.repository?.url;
+  return typeof manifest.repository === "string" ? manifest.repository : manifest.repository?.url;
 }
 
 const commitLength = 7;
@@ -44,8 +39,7 @@ export const installCommands: Record<PackageManager, string> = {
   bun: "bun add",
 };
 
-const whitelist =
-  "https://raw.githubusercontent.com/khulnasoft/pkg.khulnasoft.com/main/.whitelist";
+const whitelist = "https://raw.githubusercontent.com/khulnasoft/pkg.khulnasoft.com/main/.whitelist";
 
 export async function isWhitelisted(owner: string, repo: string) {
   const combination = `${owner}/${repo}`;

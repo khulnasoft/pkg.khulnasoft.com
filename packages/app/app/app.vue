@@ -11,8 +11,7 @@ useHead({
 
 useSeoMeta({
   title: "pkg.khulnasoft.com",
-  description:
-    "Search repositories on GitHub to list their continuous releases.",
+  description: "Search repositories on GitHub to list their continuous releases.",
 });
 </script>
 
