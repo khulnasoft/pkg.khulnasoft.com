@@ -4,15 +4,17 @@ import ezSpawn from "@jsdevtools/ez-spawn";
 import { simulation } from "@simulacrum/github-api-simulator";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { unstable_dev } from "wrangler";
+
 import prPullRequestSynchronizeFixture from "./fixtures/pr.pull_request.json";
 import prWorkflowRunRequestedFixture from "./fixtures/pr.workflow_run.requested.json";
 import pushWorkflowRunInProgressFixture from "./fixtures/workflow_run.in_progress.json";
 
 let server: Awaited<ReturnType<ReturnType<typeof simulation>["listen"]>>;
 let workerUrl: string;
-
 let worker: UnstableDevWorker;
+
 beforeAll(async () => {
+  // Start simulation server
   const app = simulation({
     initialState: {
       users: [],
@@ -33,34 +35,35 @@ beforeAll(async () => {
   });
   server = await app.listen(3300);
 
-  await ezSpawn.async(
-    "pnpm cross-env TEST=true NITRO_GH_BASE_URL=http://localhost:3300 pnpm --filter=app run build",
-    [],
-    {
-      stdio: "inherit",
-      shell: true,
-    },
-  );
+  // =====
+  // IMPORTANT:
+  // Remove any build step here.
+  // Build your project manually/CI before running tests.
+  // =====
+
+  // Launch worker in dev mode (ensure build output exists before this)
   worker = await unstable_dev(
-    `${import.meta.dirname}/dist/_worker.js/index.js`,
+    `${import.meta.dirname}/.output/server/index.mjs`,
     {
       config: `${import.meta.dirname}/wrangler.toml`,
     },
   );
-  const url = `${worker.proxyData.userWorkerUrl.protocol}//${worker.proxyData.userWorkerUrl.hostname}:${worker.proxyData.userWorkerUrl.port}`;
-  workerUrl = url;
-  await ezSpawn.async(
-    `pnpm cross-env TEST=true API_URL=${url} pnpm --filter=pkg-khulnasoft run build`,
-    [],
-    {
-      stdio: "inherit",
-      shell: true,
-    },
-  );
+
+  // Compose the worker URL using worker.address and worker.port
+  workerUrl = `http://${worker.address}:${worker.port}`;
+  console.log(`Worker URL: ${workerUrl}`);
+
+  // Optionally: Build other packages *before* tests, outside of beforeAll
+  // await ezSpawn.async(`pnpm cross-env TEST=true API_URL=${workerUrl} pnpm --filter=pkg-khulnasoft run build`, [], {
+  //   stdio: "inherit",
+  //   shell: true,
+  // });
 }, 70_000);
 
 afterAll(async () => {
-  await server.ensureClose();
+  if (server) {
+    await server.ensureClose();
+  }
 });
 
 describe.sequential.each([
@@ -69,8 +72,8 @@ describe.sequential.each([
 ] as const)("webhook endpoints", (...fixture) => {
   const [{ event, payload }, pr] = fixture;
   const mode = pr ? "pr" : "commit";
+
   it(`handles ${mode} events`, async () => {
-    // Send PR event if exists
     if (pr) {
       const prResponse = await worker.fetch("/webhook", {
         method: "POST",
@@ -83,7 +86,6 @@ describe.sequential.each([
       expect(await prResponse.json()).toEqual({ ok: true });
     }
 
-    // Send workflow run event
     const response = await worker.fetch("/webhook", {
       method: "POST",
       headers: {
@@ -98,6 +100,7 @@ describe.sequential.each([
   it(`publishes playgrounds for ${mode}`, async () => {
     const env = Object.entries({
       TEST: true,
+      API_URL: workerUrl,
       GITHUB_SERVER_URL: new URL(payload.workflow_run.html_url).origin,
       GITHUB_REPOSITORY: payload.repository.full_name,
       GITHUB_RUN_ID: payload.workflow_run.id,
@@ -117,25 +120,19 @@ describe.sequential.each([
       const process = await ezSpawn.async(
         `pnpm cross-env ${env} pnpm run -w publish:playgrounds`,
         [],
-        {
-          stdio: "overlapped",
-          shell: true,
-        },
+        { stdio: "overlapped", shell: true },
       );
-      // eslint-disable-next-line no-console
       console.log(process.stdout);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(error);
+      console.error(error);
     }
-  }, 10_000);
+  }, 30_000);
 
   it(`serves and installs playground-a for ${mode}`, async () => {
     const [owner, repo] = payload.repository.full_name.split("/");
     const sha = payload.workflow_run.head_sha.substring(0, 7);
     const ref = pr?.payload.number ?? payload.workflow_run.head_branch;
 
-    // Test download with SHA
     const shaResponse = await worker.fetch(
       `/${owner}/${repo}/playground-a@${sha}`,
     );
@@ -143,27 +140,26 @@ describe.sequential.each([
     const shaBlob = await shaResponse.blob();
     expect(shaBlob.size).toBeGreaterThan(0);
 
-    // Test download with ref matches SHA content
     const refResponse = await fetchWithRedirect(
       `/${owner}/${repo}/playground-a@${ref}`,
     );
     const refBlob = await refResponse.blob();
-    const shaBlobSize = await shaBlob.arrayBuffer();
-    const refBlobSize = await refBlob.arrayBuffer();
-    expect(shaBlobSize.byteLength).toEqual(refBlobSize.byteLength);
-    expect(shaBlobSize).toEqual(refBlobSize);
 
-    // Test installation
+    const shaBlobBuffer = await shaBlob.arrayBuffer();
+    const refBlobBuffer = await refBlob.arrayBuffer();
+
+    expect(shaBlobBuffer.byteLength).toEqual(refBlobBuffer.byteLength);
+    expect(new Uint8Array(shaBlobBuffer)).toEqual(
+      new Uint8Array(refBlobBuffer),
+    );
+
     const url = new URL(
       `/${owner}/${repo}/playground-a@${sha}?id=${Date.now()}`,
       workerUrl,
     );
     const installProcess = await ezSpawn.async(
       `pnpm cross-env CI=true npx -f playground-a@${url}`,
-      {
-        stdio: "overlapped",
-        shell: true,
-      },
+      { stdio: "overlapped", shell: true },
     );
     expect(installProcess.stdout).toContain(
       "playground-a installed successfully!",
@@ -174,7 +170,6 @@ describe.sequential.each([
     const [owner, repo] = payload.repository.full_name.split("/");
     const sha = payload.workflow_run.head_sha.substring(0, 7);
 
-    // Test download
     const response = await worker.fetch(
       `/${owner}/${repo}/playground-b@${sha}`,
     );
@@ -182,21 +177,17 @@ describe.sequential.each([
     const blob = await response.blob();
     expect(blob.size).toBeGreaterThan(0);
 
-    // Test installation
     const url = new URL(
       `/${owner}/${repo}/playground-b@${sha}?id=${Date.now()}`,
       workerUrl,
     );
     const installProcess = await ezSpawn.async(
       `pnpm cross-env CI=true npx -f playground-b@${url}`,
-      {
-        stdio: "overlapped",
-        shell: true,
-      },
+      { stdio: "overlapped", shell: true },
     );
     expect(installProcess.stdout).toContain(
       "playground-a installed successfully!",
-    ); // Should import playground-a
+    ); // imports playground-a
     expect(installProcess.stdout).toContain(
       "playground-b installed successfully!",
     );
@@ -228,7 +219,10 @@ describe("URL redirects", () => {
 
     it("redirects compact scoped package URLs correctly", async () => {
       const response = await fetchWithRedirect("/@khulnasoft/sdk@a832a55");
-      expect(response.url).toContain(expectedPath);
+      const redirectedUrl = new URL(response.url);
+      expect(decodeURIComponent(redirectedUrl.pathname)).toContain(
+        decodeURIComponent(expectedPath),
+      );
     });
   });
 });

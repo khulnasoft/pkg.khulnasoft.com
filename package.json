@@ -16,13 +16,14 @@
     "lint:fix": "prettier --write --cache .",
     "lint:types": "pnpm -r --parallel run typecheck || echo 'Type checking finished with errors'",
     "release": "tsx script/release.ts",
-    "test": "pnpm --filter=app test",
+    "test": "pnpm --filter=app run build && pnpm --filter=app test",
     "test:unit": "vitest run"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@iconify-json/mdi": "^1.2.3",
     "@jsdevtools/ez-spawn": "^3.0.4",
     "@types/node": "^20.14.2",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
