@@ -1,6 +1,4 @@
-export const createDefaultTemplate = (
-  dependencies: Record<string, string>,
-) => ({
+export const createDefaultTemplate = (dependencies: Record<string, string>) => ({
   "index.js": "",
   "README.md": `
 # Default Template

@@ -17,9 +17,7 @@ export default eventHandler(async (event) => {
   longerRefOrSha = longerRefOrSha.split(".tgz")[0]; // yarn support
 
   const isSha = isValidGitHash(longerRefOrSha);
-  const refOrSha = isSha
-    ? abbreviateCommitHash(longerRefOrSha)
-    : longerRefOrSha;
+  const refOrSha = isSha ? abbreviateCommitHash(longerRefOrSha) : longerRefOrSha;
 
   const base = `${params.owner}:${params.repo}:${refOrSha}`;
   let packageKey = `${base}:${packageName}`;
@@ -33,10 +31,7 @@ export default eventHandler(async (event) => {
   if (await cursorBucket.hasItem(cursorKey)) {
     const currentCursor = (await cursorBucket.getItem(cursorKey))!;
 
-    sendRedirect(
-      event,
-      `/${params.owner}/${params.repo}/${packageName}@${currentCursor.sha}`,
-    );
+    sendRedirect(event, `/${params.owner}/${params.repo}/${packageName}@${currentCursor.sha}`);
     return;
   }
 
@@ -63,19 +58,10 @@ export default eventHandler(async (event) => {
   }
 
   if (await packagesBucket.hasItem(packageKey)) {
-    const stream = await getItemStream(
-      event,
-      usePackagesBucket.base,
-      packageKey,
-    );
-    const obj = (await packagesBucket.getMeta(
-      packageKey,
-    )) as unknown as R2Object;
+    const stream = await getItemStream(event, usePackagesBucket.base, packageKey);
+    const obj = (await packagesBucket.getMeta(packageKey)) as unknown as R2Object;
 
-    await downloadedAtBucket.setItem(
-      obj.key,
-      Date.parse(new Date().toString()),
-    );
+    await downloadedAtBucket.setItem(obj.key, Date.parse(new Date().toString()));
 
     setResponseHeader(event, "content-type", "application/tar+gzip");
     // TODO: add HTTP caching

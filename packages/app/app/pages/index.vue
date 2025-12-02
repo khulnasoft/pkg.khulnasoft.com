@@ -30,26 +30,19 @@ function scrollToGettingStarted() {
             height="18"
             class="inline-block"
           />
-          <span class="font-semibold text-orange-500 dark:text-orange-400"
-            >Cloudflare</span
-          >
+          <span class="font-semibold text-orange-500 dark:text-orange-400">Cloudflare</span>
         </div>
       </a>
     </div>
 
-    <div
-      class="my-container flex flex-col items-center gap-4 md:gap-12 min-h-[calc(100vh-80px)]"
-    >
+    <div class="my-container flex flex-col items-center gap-4 md:gap-12 min-h-[calc(100vh-80px)]">
       <img src="/favicon.svg" alt="logo" width="64" height="64" />
 
       <RepoSearch />
 
       <div class="flex-1" />
 
-      <div
-        class="flex flex-col items-center gap-2"
-        @click.prevent="scrollToGettingStarted()"
-      >
+      <div class="flex flex-col items-center gap-2" @click.prevent="scrollToGettingStarted()">
         <div class="text-center">
           Scroll to setup continuous releases with
           <a

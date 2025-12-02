@@ -4,11 +4,7 @@ import type { PullRequestData, WorkflowData, WebhookDebugData } from "../types";
 import { hash } from "ohash";
 
 // mark a PR as a PR :)
-const prMarkEvents: PullRequestEvent["action"][] = [
-  "opened",
-  "reopened",
-  "synchronize",
-];
+const prMarkEvents: PullRequestEvent["action"][] = ["opened", "reopened", "synchronize"];
 
 export default eventHandler(async (event) => {
   const app = useOctokitApp(event);
@@ -18,9 +14,7 @@ export default eventHandler(async (event) => {
   const pullRequestNumbersBucket = usePullRequestNumbersBucket(event);
   const debugBucket = useDebugBucket(event);
 
-  const workflowHandler: HandlerFunction<"workflow_run", unknown> = async ({
-    payload,
-  }) => {
+  const workflowHandler: HandlerFunction<"workflow_run", unknown> = async ({ payload }) => {
     const [owner, repo] = payload.repository.full_name.split("/");
 
     const metadata = {
@@ -48,8 +42,7 @@ export default eventHandler(async (event) => {
 
       // old: the old of hashing the prData started to hit collision, so we need to use the new one (e.g. https://github.com/element-plus/element-plus/actions/runs/12351113750/job/34465376908)
       const oldPrDataHash = hash(prData);
-      const isOldPullRequest =
-        await pullRequestNumbersBucket.hasItem(oldPrDataHash);
+      const isOldPullRequest = await pullRequestNumbersBucket.hasItem(oldPrDataHash);
 
       const isPullRequest = isNewPullRequest || isOldPullRequest;
       const lookupKey = isNewPullRequest ? prKey : oldPrDataHash;
@@ -68,8 +61,7 @@ export default eventHandler(async (event) => {
       const debugData: WebhookDebugData = {
         action: payload.action,
         head_branch: payload.workflow_run.head_branch,
-        head_repository_full_name:
-          payload.workflow_run.head_repository?.full_name || null,
+        head_repository_full_name: payload.workflow_run.head_repository?.full_name || null,
         full_name: payload.repository.full_name,
 
         isPullRequest,
@@ -88,9 +80,7 @@ export default eventHandler(async (event) => {
     }
   };
 
-  const pullRequestHandler: HandlerFunction<"pull_request", unknown> = async ({
-    payload,
-  }) => {
+  const pullRequestHandler: HandlerFunction<"pull_request", unknown> = async ({ payload }) => {
     const headRepo = payload.pull_request.head.repo;
     if (!headRepo || !headRepo.full_name) {
       throw new Error("Invalid payload: 'full_name' is undefined.");
@@ -102,10 +92,7 @@ export default eventHandler(async (event) => {
     };
 
     if (prMarkEvents.includes(payload.action)) {
-      await pullRequestNumbersBucket.setItem(
-        `${key.full_name}:${key.ref}`,
-        payload.number,
-      );
+      await pullRequestNumbersBucket.setItem(`${key.full_name}:${key.ref}`, payload.number);
     }
   };
 
@@ -116,9 +103,7 @@ export default eventHandler(async (event) => {
     typeof app.webhooks.receive | typeof app.webhooks.verifyAndReceive
   >[0];
   const id: EmitterWebhookEvent["id"] = event.headers.get("x-github-delivery")!;
-  const name = event.headers.get(
-    "x-github-event",
-  ) as EmitterWebhookEvent["name"];
+  const name = event.headers.get("x-github-event") as EmitterWebhookEvent["name"];
   const signature = event.headers.get("x-hub-signature-256") ?? "";
   const payload = (await readRawBody(event))!;
 

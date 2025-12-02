@@ -22,10 +22,9 @@ watch(
 
     isLoading.value = true;
     try {
-      const response = await fetch(
-        `/api/repo/search?text=${encodeURIComponent(newValue)}`,
-        { signal: activeController.signal },
-      );
+      const response = await fetch(`/api/repo/search?text=${encodeURIComponent(newValue)}`, {
+        signal: activeController.signal,
+      });
       const data = (await response.json()) as { nodes: RepoNode[] };
       if (activeController === controller) {
         searchResults.value = data.nodes ?? [];
@@ -109,10 +108,7 @@ function openFirstResult() {
       />
     </div>
 
-    <div
-      v-else-if="search && !isLoading"
-      class="text-gray-500 p-12 text-center"
-    >
+    <div v-else-if="search && !isLoading" class="text-gray-500 p-12 text-center">
       No repositories found
     </div>
 

@@ -45,11 +45,7 @@ export default defineEventHandler(async (event) => {
     });
   };
 
-  const addFlowError = (
-    stage: string,
-    error: string,
-    repositoryContext?: string,
-  ) => {
+  const addFlowError = (stage: string, error: string, repositoryContext?: string) => {
     flowErrors.push({
       stage,
       error,
@@ -61,9 +57,7 @@ export default defineEventHandler(async (event) => {
   try {
     addFlowStage("query_validation", "Starting query validation");
 
-    const query = await getValidatedQuery(event, (data) =>
-      querySchema.parse(data),
-    );
+    const query = await getValidatedQuery(event, (data) => querySchema.parse(data));
 
     if (!query.text) {
       addFlowStage("early_return", "Empty query text");
@@ -99,10 +93,7 @@ export default defineEventHandler(async (event) => {
       await app.eachRepository(async ({ repository }) => {
         try {
           if (signal.aborted) {
-            addFlowStage(
-              "search_aborted",
-              `Aborted at repository: ${repository.full_name}`,
-            );
+            addFlowStage("search_aborted", `Aborted at repository: ${repository.full_name}`);
             status = "aborted";
             return;
           }
@@ -128,20 +119,10 @@ export default defineEventHandler(async (event) => {
 
           let nameScore, ownerScore;
           try {
-            nameScore = stringSimilarity.compareTwoStrings(
-              repoName,
-              searchText,
-            );
-            ownerScore = stringSimilarity.compareTwoStrings(
-              ownerLogin,
-              searchText,
-            );
+            nameScore = stringSimilarity.compareTwoStrings(repoName, searchText);
+            ownerScore = stringSimilarity.compareTwoStrings(ownerLogin, searchText);
           } catch (err: any) {
-            addFlowError(
-              "string_similarity",
-              err.message,
-              repository.full_name,
-            );
+            addFlowError("string_similarity", err.message, repository.full_name);
             // Use fallback scoring
             nameScore = repoName.includes(searchText) ? 0.5 : 0;
             ownerScore = ownerLogin.includes(searchText) ? 0.5 : 0;
@@ -162,36 +143,19 @@ export default defineEventHandler(async (event) => {
             addFlowError("match_creation", err.message, repository.full_name);
           }
         } catch (err: any) {
-          if (
-            err.message?.includes("suspended") ||
-            err.message?.includes("Installation")
-          ) {
+          if (err.message?.includes("suspended") || err.message?.includes("Installation")) {
             suspendedErrors++;
-            addFlowError(
-              "repository_suspended",
-              err.message,
-              repository.full_name,
-            );
+            addFlowError("repository_suspended", err.message, repository.full_name);
             return;
           }
-          addFlowError(
-            "repository_processing",
-            err.message,
-            repository.full_name,
-          );
+          addFlowError("repository_processing", err.message, repository.full_name);
           throw err;
         }
       });
 
-      addFlowStage(
-        "repository_iteration_complete",
-        `Completed repository iteration`,
-      );
+      addFlowStage("repository_iteration_complete", `Completed repository iteration`);
     } catch (err: any) {
-      if (
-        err.message?.includes("suspended") ||
-        err.message?.includes("Installation")
-      ) {
+      if (err.message?.includes("suspended") || err.message?.includes("Installation")) {
         addFlowError(
           "iteration_suspended",
           `Installation suspended after processing ${processedRepositories} repositories: ${err.message}`,
@@ -209,9 +173,7 @@ export default defineEventHandler(async (event) => {
     addFlowStage("sorting_matches", `Sorting ${matches.length} matches`);
 
     try {
-      matches.sort((a, b) =>
-        b.score !== a.score ? b.score - a.score : b.stars - a.stars,
-      );
+      matches.sort((a, b) => (b.score !== a.score ? b.score - a.score : b.stars - a.stars));
       addFlowStage("sorting_complete", "Matches sorted successfully");
     } catch (err: any) {
       addFlowError("sorting", err.message);

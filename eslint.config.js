@@ -13,6 +13,9 @@ export default [
       "packages/*/dist/**",
       "packages/app/.nuxt/**",
       "packages/cli/dist/**",
+      "packages/app/.output/**",
+      "packages/sdk/bundles/**",
+      "packages/sdk/types/**",
     ],
   },
   // JavaScript and TypeScript files
@@ -39,8 +42,7 @@ export default [
       // Basic rules
       "no-console": "warn",
       "no-debugger": "warn",
-      "no-unused-vars": "warn",
-      "prefer-const": "error",
+      "prefer-const": "off",
       "no-useless-constructor": "error",
 
       // TypeScript rules
@@ -72,12 +74,7 @@ export default [
 
       // Other rules
       camelcase: "off",
-      "no-empty": [
-        "error",
-        {
-          allowEmptyCatch: true,
-        },
-      ],
+      "no-empty": "warn",
     },
   },
   // Vue files

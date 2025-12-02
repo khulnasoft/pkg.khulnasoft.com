@@ -31,16 +31,10 @@ export default eventHandler(async (event) => {
     }
     const [owner, repo] = match;
 
-    sendRedirect(
-      event,
-      `/${owner}/${repo}/${encodeURIComponent(packageNameWithOrg)}@${refOrSha}`,
-    );
+    sendRedirect(event, `/${owner}/${repo}/${encodeURIComponent(packageNameWithOrg)}@${refOrSha}`);
     return;
   }
 
   // -> https://pkg.khulnasoft.com/tinylibs/tinybench/tinybench@a832a55
-  sendRedirect(
-    event,
-    `/${params.owner}/${packageName}/${packageName}@${refOrSha}`,
-  );
+  sendRedirect(event, `/${params.owner}/${packageName}/${packageName}@${refOrSha}`);
 });

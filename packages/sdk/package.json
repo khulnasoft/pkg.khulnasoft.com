@@ -1,0 +1,60 @@
+{
+  "name": "@khulnasoft/sdk",
+  "version": "1.0.0",
+  "description": "SDK for generating and embedding KhulnaSoft projects.",
+  "license": "MIT",
+  "author": "KhulnaSoft Ltd.",
+  "homepage": "https://github.com/khulnasoft/pkg.khulnasoft.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/khulnasoft/pkg.khulnasoft.com.git",
+    "directory": "packages/sdk"
+  },
+  "main": "./bundles/sdk.js",
+  "module": "./bundles/sdk.m.js",
+  "unpkg": "./bundles/sdk.umd.js",
+  "jsdelivr": "./bundles/sdk.umd.js",
+  "types": "./types/index.d.ts",
+  "files": [
+    "bundles",
+    "types",
+    "LICENSE.md",
+    "README.md"
+  ],
+  "keywords": [
+    "sdk",
+    "khulnasoft",
+    "embed",
+    "webcontainer",
+    "ide",
+    "development",
+    "prototyping",
+    "playground",
+    "javascript",
+    "typescript"
+  ],
+  "scripts": {
+    "build": "npm run build:clean && npm run build:types && npm run build:lib",
+    "build:clean": "rimraf bundles temp types",
+    "build:lib": "vite build --mode lib",
+    "build:types": "tsc -p tsconfig.lib.json",
+    "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts' vite.*.ts",
+    "prepack": "npm run test:unit && npm run build",
+    "start": "vite dev --mode dev --open /examples/",
+    "start:e2e": "vite dev --mode e2e",
+    "test": "vitest run --mode test --coverage",
+    "test:unit": "vitest run --mode test",
+    "test:e2e": "npx playwright test",
+    "test:format": "npx prettier --check .",
+    "prepublishOnly": "npm run test:unit && npm run build",
+    "publish": "npm publish --access public"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.2",
+    "@types/lodash": "^4.14.192",
+    "body-parser": "^1.20.2",
+    "happy-dom": "^9.1.0",
+    "lodash": "^4.17.21",
+    "vite-tsconfig-paths": "^4.0.8"
+  }
+}

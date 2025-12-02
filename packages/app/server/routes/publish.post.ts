@@ -26,14 +26,12 @@ export default eventHandler(async (event) => {
     const onlyTemplates = onlyTemplatesHeader === "true";
     const comment: Comment = (commentHeader ?? "update") as Comment;
     const bin = binHeader === "true";
-    const packageManager: PackageManager =
-      (packageManagerHeader as PackageManager) || "npm";
+    const packageManager: PackageManager = (packageManagerHeader as PackageManager) || "npm";
 
     if (!key || !runIdHeader || !shasumsHeader) {
       throw createError({
         statusCode: 400,
-        message:
-          "sb-commit-timestamp, sb-key and sb-shasums headers are required",
+        message: "sb-commit-timestamp, sb-key and sb-shasums headers are required",
       });
     }
     const runId = Number(runIdHeader);
@@ -50,10 +48,7 @@ export default eventHandler(async (event) => {
       });
     }
 
-    const whitelisted = await isWhitelisted(
-      workflowData.owner,
-      workflowData.repo,
-    );
+    const whitelisted = await isWhitelisted(workflowData.owner, workflowData.repo);
     const contentLength = Number(getHeader(event, "content-length"));
 
     // 20mb limit for now
@@ -68,15 +63,9 @@ export default eventHandler(async (event) => {
 
     const shasums: Record<string, string> = JSON.parse(shasumsHeader);
     const formData = await readFormData(event);
-    const packages = [...formData.keys()].filter((k) =>
-      k.startsWith("package:"),
-    );
-    const packagesWithoutPrefix = packages.map((p) =>
-      p.slice("package:".length),
-    );
-    const templateAssets = [...formData.keys()].filter((k) =>
-      k.startsWith("template:"),
-    );
+    const packages = [...formData.keys()].filter((k) => k.startsWith("package:"));
+    const packagesWithoutPrefix = packages.map((p) => p.slice("package:".length));
+    const templateAssets = [...formData.keys()].filter((k) => k.startsWith("template:"));
 
     if (packages.length === 0) {
       throw createError({
@@ -116,15 +105,9 @@ export default eventHandler(async (event) => {
               : lastPackageKey;
 
           const stream = file.stream();
-          return setItemStream(
-            event,
-            usePackagesBucket.base,
-            packageKey,
-            stream,
-            {
-              sha1: shasums[packageName],
-            },
-          );
+          return setItemStream(event, usePackagesBucket.base, packageKey, stream, {
+            sha1: shasums[packageName],
+          });
         }
         return null;
       }),
@@ -146,9 +129,7 @@ export default eventHandler(async (event) => {
 
         templatesMap.set(template, {
           ...templatesMap.get(template),
-          [templateAsset]: isBinary
-            ? new URL(`/template/${uuid}`, origin).href
-            : file,
+          [templateAsset]: isBinary ? new URL(`/template/${uuid}`, origin).href : file,
         });
 
         if (isBinary) {
@@ -189,25 +170,18 @@ export default eventHandler(async (event) => {
       generatePublishUrl("sha", origin, packageName, workflowData, compact),
     );
 
-    const installation = await useOctokitInstallation(
-      event,
-      workflowData.owner,
-      workflowData.repo,
-    );
+    const installation = await useOctokitInstallation(event, workflowData.owner, workflowData.repo);
 
     const checkName = "Continuous Releases";
     const {
       data: { check_runs },
-    } = await installation.request(
-      "GET /repos/{owner}/{repo}/commits/{ref}/check-runs",
-      {
-        check_name: checkName,
-        owner: workflowData.owner,
-        repo: workflowData.repo,
-        ref: workflowData.sha,
-        app_id: Number(appId),
-      },
-    );
+    } = await installation.request("GET /repos/{owner}/{repo}/commits/{ref}/check-runs", {
+      check_name: checkName,
+      owner: workflowData.owner,
+      repo: workflowData.repo,
+      ref: workflowData.sha,
+      app_id: Number(appId),
+    });
 
     let checkRunUrl = check_runs[0]?.html_url ?? "";
 
@@ -265,36 +239,30 @@ export default eventHandler(async (event) => {
       if (comment !== "off") {
         const {
           data: { permissions },
-        } = await installation.request(
-          "GET /repos/{owner}/{repo}/installation",
-          {
-            owner: workflowData.owner,
-            repo: workflowData.repo,
-          },
-        );
+        } = await installation.request("GET /repos/{owner}/{repo}/installation", {
+          owner: workflowData.owner,
+          repo: workflowData.repo,
+        });
 
         try {
           if (comment === "update" && prevComment!) {
-            await installation.request(
-              "PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}",
-              {
-                owner: workflowData.owner,
-                repo: workflowData.repo,
-                comment_id: prevComment.id,
-                body: generatePullRequestPublishMessage(
-                  origin,
-                  templatesHtmlMap,
-                  packagesWithoutPrefix,
-                  workflowData,
-                  compact,
-                  onlyTemplates,
-                  checkRunUrl,
-                  packageManager,
-                  "ref",
-                  bin,
-                ),
-              },
-            );
+            await installation.request("PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}", {
+              owner: workflowData.owner,
+              repo: workflowData.repo,
+              comment_id: prevComment.id,
+              body: generatePullRequestPublishMessage(
+                origin,
+                templatesHtmlMap,
+                packagesWithoutPrefix,
+                workflowData,
+                compact,
+                onlyTemplates,
+                checkRunUrl,
+                packageManager,
+                "ref",
+                bin,
+              ),
+            });
           } else {
             await installation.request(
               "POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
@@ -323,12 +291,8 @@ export default eventHandler(async (event) => {
       }
     }
 
-    event.waitUntil(
-      iterateAndDelete(event, usePackagesBucket.base, lastPackageKey!),
-    );
-    event.waitUntil(
-      iterateAndDelete(event, useTemplatesBucket.base, lastTemplateKey!),
-    );
+    event.waitUntil(iterateAndDelete(event, usePackagesBucket.base, lastPackageKey!));
+    event.waitUntil(iterateAndDelete(event, useTemplatesBucket.base, lastTemplateKey!));
 
     return {
       ok: true,
@@ -348,9 +312,7 @@ export default eventHandler(async (event) => {
     }
 
     const message =
-      error instanceof Error
-        ? error.message
-        : "An unexpected error occurred during publishing";
+      error instanceof Error ? error.message : "An unexpected error occurred during publishing";
     const stack = error instanceof Error ? error.stack : undefined;
 
     throw createError({
@@ -386,11 +348,7 @@ async function getPullRequestState(
   }
 }
 
-async function iterateAndDelete(
-  event: H3Event,
-  base: string,
-  startAfter: string,
-) {
+async function iterateAndDelete(event: H3Event, base: string, startAfter: string) {
   const binding = useBinding(event);
   const removedItems: Array<{
     key: string;

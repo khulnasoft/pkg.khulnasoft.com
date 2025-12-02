@@ -1,0 +1,9 @@
+{
+  "name": "sdk-example-open-embed-project-id",
+  "description": "Demo of the khulnaSoft SDK's methods for opening & embedding an existing khulnaSoft project",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@khulnasoft/sdk": "^1.8.1"
+  }
+}

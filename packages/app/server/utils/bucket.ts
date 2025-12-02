@@ -14,9 +14,7 @@ export const baseKey = "bucket";
 
 export function useBinding(event: Event) {
   return getR2Binding(
-    event.context.cloudflare.env.ENV === "production"
-      ? "PROD_CR_BUCKET"
-      : "CR_BUCKET",
+    event.context.cloudflare.env.ENV === "production" ? "PROD_CR_BUCKET" : "CR_BUCKET",
   );
 }
 
@@ -33,12 +31,7 @@ export async function setItemStream(
   await binding.put(key, stream, opts);
 }
 
-export async function getItemStream(
-  event: Event,
-  base: string,
-  key: string,
-  opts?: R2GetOptions,
-) {
+export async function getItemStream(event: Event, base: string, key: string, opts?: R2GetOptions) {
   const binding = useBinding(event);
   key = joinKeys(base, key);
 
@@ -98,17 +91,11 @@ export function useDownloadedAtBucket(event: Event) {
 }
 
 useDownloadedAtBucket.key = "downloaded-at";
-useDownloadedAtBucket.base = joinKeys(
-  useBucket.base,
-  useDownloadedAtBucket.key,
-);
+useDownloadedAtBucket.base = joinKeys(useBucket.base, useDownloadedAtBucket.key);
 
 export function usePullRequestNumbersBucket(event: Event): Storage<number> {
   const storage = useBucket(event);
-  const newStorage = prefixStorage<number>(
-    storage,
-    usePullRequestNumbersBucket.key,
-  );
+  const newStorage = prefixStorage<number>(storage, usePullRequestNumbersBucket.key);
   const oldStorage = prefixStorage<number>(storage, useDownloadedAtBucket.key);
 
   return {
@@ -130,10 +117,7 @@ export function usePullRequestNumbersBucket(event: Event): Storage<number> {
   };
 }
 usePullRequestNumbersBucket.key = "pr-number";
-usePullRequestNumbersBucket.base = joinKeys(
-  useBucket.base,
-  usePullRequestNumbersBucket.key,
-);
+usePullRequestNumbersBucket.base = joinKeys(useBucket.base, usePullRequestNumbersBucket.key);
 
 export function useDebugBucket(event: Event) {
   const storage = useBucket(event);

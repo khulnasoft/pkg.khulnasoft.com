@@ -33,16 +33,12 @@ const getRepoInfo = defineCachedFunction(
         releaseCount,
       };
     } catch (error) {
-      console.error(
-        `Error fetching repository info for ${owner}/${repo}:`,
-        error,
-      );
+      console.error(`Error fetching repository info for ${owner}/${repo}:`, error);
       throw error;
     }
   },
   {
-    getKey: (owner: string, repo: string, _event?: H3Event) =>
-      `${owner}/${repo}`,
+    getKey: (owner: string, repo: string, _event?: H3Event) => `${owner}/${repo}`,
     maxAge: 60 * 30, // 30 minutes
     swr: true,
   },
@@ -50,9 +46,7 @@ const getRepoInfo = defineCachedFunction(
 
 export default defineEventHandler(async (event) => {
   try {
-    const query = await getValidatedQuery(event, (data) =>
-      querySchema.parse(data),
-    );
+    const query = await getValidatedQuery(event, (data) => querySchema.parse(data));
     return getRepoInfo(query.owner, query.repo, event);
   } catch (error) {
     console.error("Error in repo info endpoint:", error);

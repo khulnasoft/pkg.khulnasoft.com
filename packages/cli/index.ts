@@ -100,8 +100,7 @@ const main = defineCommand({
           },
           packageManager: {
             type: "string",
-            description:
-              "Specify the package manager to use (npm, bun, pnpm, yarn)",
+            description: "Specify the package manager to use (npm, bun, pnpm, yarn)",
             enum: ["npm", "bun", "pnpm", "yarn"],
             default: "npm",
           },
@@ -165,9 +164,7 @@ const main = defineCommand({
           }
 
           if (!process.env.TEST && process.env.GITHUB_ACTIONS !== "true") {
-            console.error(
-              "Continuous Releases are only available in GitHub Actions.",
-            );
+            console.error("Continuous Releases are only available in GitHub Actions.");
             process.exit(1);
           }
 
@@ -208,9 +205,7 @@ const main = defineCommand({
 
           if (!checkResponse.ok) {
             const errorText = await checkResponse.text();
-            console.error(
-              `Check failed (${checkResponse.status}): ${errorText}`,
-            );
+            console.error(`Check failed (${checkResponse.status}): ${errorText}`);
             process.exit(1);
           }
 
@@ -218,9 +213,7 @@ const main = defineCommand({
           const formattedSha = isCompact ? abbreviateCommitHash(sha) : sha;
 
           const deps: Map<string, string> = new Map(); // pkg.khulnasoft.com versions of the package
-          const realDeps: Map<string, string> | null = isPeerDepsEnabled
-            ? new Map()
-            : null; // real versions of the package, useful for peerDependencies
+          const realDeps: Map<string, string> | null = isPeerDepsEnabled ? new Map() : null; // real versions of the package, useful for peerDependencies
 
           const printJson = typeof args.json === "boolean";
           const saveJson = typeof args.json === "string";
@@ -248,10 +241,8 @@ const main = defineCommand({
             if (isCompact) {
               await verifyCompactMode(pJson.name);
             }
-            const longDepUrl = new URL(
-              `/${owner}/${repo}/${pJson.name}@${formattedSha}`,
-              apiUrl,
-            ).href;
+            const longDepUrl = new URL(`/${owner}/${repo}/${pJson.name}@${formattedSha}`, apiUrl)
+              .href;
             deps.set(pJson.name, longDepUrl);
             realDeps?.set(pJson.name, pJson.version ?? longDepUrl);
 
@@ -269,14 +260,10 @@ const main = defineCommand({
                   `Server error checking ${longDepUrl} (${resource.status}), proceeding with publish`,
                 );
               } else {
-                console.warn(
-                  `Unexpected response checking ${longDepUrl} (${resource.status})`,
-                );
+                console.warn(`Unexpected response checking ${longDepUrl} (${resource.status})`);
               }
             } catch (error) {
-              console.warn(
-                `Failed to check if package exists at ${longDepUrl}: ${error}`,
-              );
+              console.warn(`Failed to check if package exists at ${longDepUrl}: ${error}`);
             }
             controller.abort();
 
@@ -295,14 +282,10 @@ const main = defineCommand({
           for (const templateDir of templates) {
             const pJsonPath = path.resolve(templateDir, "package.json");
             const pJsonContents = await tryReadFile(pJsonPath);
-            const pJson = pJsonContents
-              ? parsePackageJson(pJsonContents)
-              : null;
+            const pJson = pJsonContents ? parsePackageJson(pJsonContents) : null;
 
             if (!pJson || !pJsonContents) {
-              console.warn(
-                `skipping ${templateDir} because there's no package.json file`,
-              );
+              console.warn(`skipping ${templateDir} because there's no package.json file`);
               continue;
             }
 
@@ -312,13 +295,7 @@ const main = defineCommand({
 
             console.warn("preparing template:", pJson.name);
 
-            const restore = await writeDeps(
-              templateDir,
-              pJsonContents,
-              pJson,
-              deps,
-              realDeps,
-            );
+            const restore = await writeDeps(templateDir, pJsonContents, pJson, deps, realDeps);
 
             const gitignorePath = path.join(templateDir, ".gitignore");
             const ig = ignore().add("node_modules").add(".git");
@@ -351,10 +328,7 @@ const main = defineCommand({
             await restore();
 
             // Collect template metadata
-            const templateUrl = new URL(
-              `/${owner}/${repo}/template/${pJson.name}`,
-              apiUrl,
-            ).href;
+            const templateUrl = new URL(`/${owner}/${repo}/template/${pJson.name}`, apiUrl).href;
             outputMetadata.templates.push({
               name: pJson.name,
               url: templateUrl,
@@ -364,9 +338,7 @@ const main = defineCommand({
           const noDefaultTemplate = args.template === false;
 
           if (!noDefaultTemplate && templates.length === 0) {
-            const project = createDefaultTemplate(
-              Object.fromEntries(deps.entries()),
-            );
+            const project = createDefaultTemplate(Object.fromEntries(deps.entries()));
 
             for (const filePath of Object.keys(project)) {
               formData.append(
@@ -376,16 +348,11 @@ const main = defineCommand({
             }
           }
 
-          const restoreMap = new Map<
-            string,
-            Awaited<ReturnType<typeof writeDeps>>
-          >();
+          const restoreMap = new Map<string, Awaited<ReturnType<typeof writeDeps>>>();
           for (const p of paths) {
             const pJsonPath = path.resolve(p, "package.json");
             const pJsonContents = await tryReadFile(pJsonPath);
-            const pJson = pJsonContents
-              ? parsePackageJson(pJsonContents)
-              : null;
+            const pJson = pJsonContents ? parsePackageJson(pJsonContents) : null;
 
             if (!pJson || !pJsonContents) {
               continue;
@@ -395,10 +362,7 @@ const main = defineCommand({
               continue;
             }
 
-            restoreMap.set(
-              p,
-              await writeDeps(p, pJsonContents, pJson, deps, realDeps),
-            );
+            restoreMap.set(p, await writeDeps(p, pJsonContents, pJson, deps, realDeps));
           }
 
           const shasums: Record<string, string> = {};
@@ -406,34 +370,24 @@ const main = defineCommand({
             const pJsonPath = path.resolve(p, "package.json");
             const pJson = await readPackageJson(pJsonPath);
             if (!pJson) {
-              console.warn(
-                `skipping ${p} because there's no package.json file`,
-              );
+              console.warn(`skipping ${p} because there's no package.json file`);
               continue;
             }
 
             try {
               if (!pJson.name) {
-                throw new Error(
-                  `"name" field in ${pJsonPath} should be defined`,
-                );
+                throw new Error(`"name" field in ${pJsonPath} should be defined`);
               }
               if (pJson.private) {
                 console.warn(`skipping ${p} because the package is private`);
                 continue;
               }
 
-              const { filename, shasum } = await resolveTarball(
-                packMethod,
-                p,
-                pJson,
-              );
+              const { filename, shasum } = await resolveTarball(packMethod, p, pJson);
 
               shasums[pJson.name] = shasum;
 
-              const outputPkg = outputMetadata.packages.find(
-                (p) => p.name === pJson.name,
-              )!;
+              const outputPkg = outputMetadata.packages.find((p) => p.name === pJson.name)!;
               outputPkg.shasum = shasum;
 
               const filePath = path.resolve(p, filename);
@@ -476,8 +430,7 @@ const main = defineCommand({
                   console.error(await createMultipartRes.text());
                   continue;
                 }
-                const { key: uploadKey, id: uploadId } =
-                  await createMultipartRes.json();
+                const { key: uploadKey, id: uploadId } = await createMultipartRes.json();
 
                 interface R2UploadedPart {
                   partNumber: number;
@@ -518,13 +471,10 @@ const main = defineCommand({
                   },
                 });
                 if (!completeMultipartRes.ok) {
-                  console.error(
-                    `Error completing ${key}: ${await completeMultipartRes.text()}`,
-                  );
+                  console.error(`Error completing ${key}: ${await completeMultipartRes.text()}`);
                   break;
                 }
-                const { key: completionKey } =
-                  await completeMultipartRes.json();
+                const { key: completionKey } = await completeMultipartRes.json();
 
                 formData.set(name, `object:${completionKey}`);
               }
@@ -675,10 +625,7 @@ async function writeDeps(
   return () => fs.writeFile(pJsonPath, pJsonContents);
 }
 
-function hijackDeps(
-  newDeps: Map<string, string>,
-  oldDeps?: Record<string, string>,
-) {
+function hijackDeps(newDeps: Map<string, string>, oldDeps?: Record<string, string>) {
   if (!oldDeps) {
     return;
   }

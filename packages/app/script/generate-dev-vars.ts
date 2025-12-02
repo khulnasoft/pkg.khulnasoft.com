@@ -3,10 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 async function generateDevVars() {
-  const filePath = path.join(
-    path.dirname(new URL(import.meta.url).pathname),
-    "../.dev.vars",
-  );
+  const filePath = path.join(path.dirname(new URL(import.meta.url).pathname), "../.dev.vars");
 
   // Try to read existing vars
   let existingVars: Record<string, string> = {};
@@ -27,13 +24,10 @@ async function generateDevVars() {
   const updates: Record<string, string> = {
     NITRO_TEST: existingVars.NITRO_TEST || "true",
     NITRO_WEBHOOK_SECRET:
-      existingVars.NITRO_WEBHOOK_SECRET ||
-      crypto.randomBytes(16).toString("hex"),
+      existingVars.NITRO_WEBHOOK_SECRET || crypto.randomBytes(16).toString("hex"),
     NITRO_APP_ID: existingVars.NITRO_APP_ID || "859925",
-    NITRO_GH_BASE_URL:
-      existingVars.NITRO_GH_BASE_URL || "http://localhost:3300",
-    NITRO_RM_STALE_KEY:
-      existingVars.NITRO_RM_STALE_KEY || crypto.randomBytes(32).toString("hex"),
+    NITRO_GH_BASE_URL: existingVars.NITRO_GH_BASE_URL || "http://localhost:3300",
+    NITRO_RM_STALE_KEY: existingVars.NITRO_RM_STALE_KEY || crypto.randomBytes(32).toString("hex"),
     NITRO_GITHUB_TOKEN: existingVars.NITRO_GITHUB_TOKEN || "ghp",
   };
 

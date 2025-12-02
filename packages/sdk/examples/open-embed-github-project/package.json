@@ -1,0 +1,9 @@
+{
+  "name": "sdk-example-open-embed-github-project",
+  "description": "Demo of the khulnaSoft SDK's methods for opening & embedding Github projects.",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@khulnasoft/sdk": "^1.8.1"
+  }
+}

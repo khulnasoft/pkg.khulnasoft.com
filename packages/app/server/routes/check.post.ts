@@ -50,9 +50,7 @@ export default eventHandler(async (event) => {
     }
 
     const message =
-      error instanceof Error
-        ? error.message
-        : "An unexpected error occurred during check";
+      error instanceof Error ? error.message : "An unexpected error occurred during check";
     const stack = error instanceof Error ? error.stack : undefined;
 
     throw createError({

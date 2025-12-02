@@ -28,13 +28,7 @@ export function generateCommitPublishMessage(
   const isMoreThanFour = packages.length > 4;
   const shaMessages = packages
     .map((packageName) => {
-      let shaUrl = generatePublishUrl(
-        "sha",
-        origin,
-        packageName,
-        workflowData,
-        compact,
-      );
+      let shaUrl = generatePublishUrl("sha", origin, packageName, workflowData, compact);
       return packageManager
         .split(",")
         .map((pm) => {
@@ -53,9 +47,7 @@ export function generateCommitPublishMessage(
         .join("\n");
     })
     .map((message, i) =>
-      isMoreThanFour
-        ? createCollapsibleBlock(`<b>${packages[i]}</b>`, message)
-        : message,
+      isMoreThanFour ? createCollapsibleBlock(`<b>${packages[i]}</b>`, message) : message,
     )
     .join("\n");
 
@@ -83,13 +75,7 @@ export function generatePullRequestPublishMessage(
   const isMoreThanFour = packages.length > 4;
   const refMessages = packages
     .map((packageName) => {
-      let refUrl = generatePublishUrl(
-        base,
-        origin,
-        packageName,
-        workflowData,
-        compact,
-      );
+      let refUrl = generatePublishUrl(base, origin, packageName, workflowData, compact);
       return packageManager
         .split(",")
         .map((pm) => {
@@ -106,9 +92,7 @@ export function generatePullRequestPublishMessage(
         .join("\n");
     })
     .map((message, i) =>
-      isMoreThanFour
-        ? createCollapsibleBlock(`<b>${packages[i]}</b>`, message)
-        : message,
+      isMoreThanFour ? createCollapsibleBlock(`<b>${packages[i]}</b>`, message) : message,
     )
     .join("\n");
 
@@ -126,14 +110,10 @@ _commit: <a href="${checkRunUrl}"><code>${abbreviateCommitHash(workflowData.sha)
 function generateTemplatesStr(templates: Record<string, string>) {
   const entries = Object.entries(templates).filter(([k]) => k !== "default");
   let str =
-    entries.length === 0 && templates.default
-      ? `[Open in StackBlitz](${templates.default})`
-      : "";
+    entries.length === 0 && templates.default ? `[Open in KhulnaSoft](${templates.default})` : "";
 
   if (entries.length > 0 && entries.length <= 2) {
-    str = [str, ...entries.map(([k, v]) => `- [${k}](${v})`)]
-      .filter(Boolean)
-      .join("\n");
+    str = [str, ...entries.map(([k, v]) => `- [${k}](${v})`)].filter(Boolean).join("\n");
   } else if (entries.length > 2) {
     str += createCollapsibleBlock(
       "<b>More templates</b>",
@@ -152,8 +132,7 @@ export function generatePublishUrl(
   workflowData: WorkflowData,
   compact: boolean,
 ) {
-  const tag =
-    base === "sha" ? abbreviateCommitHash(workflowData.sha) : workflowData.ref;
+  const tag = base === "sha" ? abbreviateCommitHash(workflowData.sha) : workflowData.ref;
   const shorter = workflowData.repo === packageName;
 
   const urlPath = compact

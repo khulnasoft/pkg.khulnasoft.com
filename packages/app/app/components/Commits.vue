@@ -40,9 +40,7 @@ const commitsWithRelease = computed(() =>
     })),
 );
 
-const selectedCommit = shallowRef<
-  (typeof commitsWithRelease.value)[number] | null
->(null);
+const selectedCommit = shallowRef<(typeof commitsWithRelease.value)[number] | null>(null);
 
 let shiki: HighlighterCore;
 
@@ -202,17 +200,10 @@ async function fetchMore() {
     </div>
 
     <div
-      v-if="
-        branch.target.history.pageInfo.hasNextPage && !fetchMoreForceDisabled
-      "
+      v-if="branch.target.history.pageInfo.hasNextPage && !fetchMoreForceDisabled"
       class="flex justify-center"
     >
-      <UButton
-        color="neutral"
-        variant="subtle"
-        :loading="fetching"
-        @click="fetchMore()"
-      >
+      <UButton color="neutral" variant="subtle" :loading="fetching" @click="fetchMore()">
         Load More
       </UButton>
     </div>
@@ -244,10 +235,7 @@ async function fetchMore() {
       @update:open="selectedCommit = null"
     >
       <template #content>
-        <div
-          v-if="selectedCommit"
-          class="p-4 flex flex-col items-stretch gap-4 overflow-auto"
-        >
+        <div v-if="selectedCommit" class="p-4 flex flex-col items-stretch gap-4 overflow-auto">
           <div class="flex items-center gap-2">
             <UButton
               icon="ph-x"

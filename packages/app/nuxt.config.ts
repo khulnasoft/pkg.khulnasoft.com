@@ -12,7 +12,7 @@ export default defineNuxtConfig({
   devtools: { enabled: false }, // Changed from true to false to reduce memory usage during build.
 
   nitro: {
-    preset: "node_server",
+    preset: process.env.NITRO_PRESET || "cloudflare-pages",
 
     // sourceMap: "inline", // Commented out to reduce memory usage during build.
 

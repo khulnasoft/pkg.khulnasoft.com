@@ -21,10 +21,7 @@ export default eventHandler(async (event) => {
   }
   const workflowData = (await workflowsBucket.getItem(workflowKey))!;
 
-  const whitelisted = await isWhitelisted(
-    workflowData.owner,
-    workflowData.repo,
-  );
+  const whitelisted = await isWhitelisted(workflowData.owner, workflowData.repo);
 
   if (!whitelisted) {
     // Payload too large

@@ -55,9 +55,7 @@ useSeoMeta({
           {{ repository.name }}
         </a>
       </h1>
-      <div
-        class="flex items-center justify-center gap-2 text-gray-700 dark:text-gray-300"
-      >
+      <div class="flex items-center justify-center gap-2 text-gray-700 dark:text-gray-300">
         <UButton
           :to="repository.url"
           external
@@ -80,13 +78,8 @@ useSeoMeta({
       </div>
 
       <div class="flex flex-col items-center justify-center mt-2">
-        <p class="text-sm mb-[10px]">
-          You can copy the badge and add it to your README!
-        </p>
-        <BadgeGenerator
-          :owner="repository.owner.login"
-          :repo="repository.name"
-        />
+        <p class="text-sm mb-[10px]">You can copy the badge and add it to your README!</p>
+        <BadgeGenerator :owner="repository.owner.login" :repo="repository.name" />
       </div>
     </div>
 

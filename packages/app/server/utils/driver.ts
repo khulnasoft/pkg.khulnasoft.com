@@ -5,11 +5,7 @@ export interface CloudflareR2Options {
   base?: string;
 }
 
-export function createUnstorageError(
-  driver: string,
-  message: string,
-  opts?: ErrorOptions,
-) {
+export function createUnstorageError(driver: string, message: string, opts?: ErrorOptions) {
   const err = new Error(`[unstorage] [${driver}] ${message}`, opts);
   return err;
 }
@@ -19,15 +15,13 @@ export function getBinding(binding: KVNamespace | R2Bucket | string) {
 
   if (typeof binding === "string") {
     bindingName = binding;
-    binding = ((globalThis as any)[bindingName] ||
-      (globalThis as any).__env__?.[bindingName]) as KVNamespace | R2Bucket;
+    binding = ((globalThis as any)[bindingName] || (globalThis as any).__env__?.[bindingName]) as
+      | KVNamespace
+      | R2Bucket;
   }
 
   if (!binding) {
-    throw createUnstorageError(
-      "cloudflare",
-      `Invalid binding \`${bindingName}\`: \`${binding}\``,
-    );
+    throw createUnstorageError("cloudflare", `Invalid binding \`${bindingName}\`: \`${binding}\``);
   }
 
   for (const key of ["get", "put", "delete"]) {

@@ -1,35 +1,178 @@
 {
-  "extends": ["eslint-config-unjs"],
+  "root": true,
+  "ignorePatterns": [
+    "node_modules/",
+    "dist/",
+    "build/",
+    "coverage/",
+    "*.d.ts"
+  ],
+
+  "env": {
+    "es2023": true,
+    "node": true
+  },
+
+  "extends": [
+    "eslint-config-unjs",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "plugin:promise/recommended",
+    "plugin:unicorn/recommended",
+    "plugin:jsonc/recommended-with-json",
+    "plugin:yaml/recommended",
+    "plugin:markdown/recommended",
+    "plugin:prettier/recommended"
+  ],
+
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": "latest",
+    "project": "./tsconfig.json",
+    "extraFileExtensions": [".json", ".md"]
+  },
+
+  "plugins": [
+    "@typescript-eslint",
+    "import",
+    "promise",
+    "unicorn",
+    "spellcheck",
+    "prettier"
+  ],
+
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "project": "./tsconfig.json"
+      }
+    }
+  },
+
   "rules": {
-    "unicorn/no-null": "off",
+    /* -----------------------------
+     *  GENERAL BEST PRACTICES
+     * ----------------------------- */
+    "prefer-const": "error",
     "require-await": "error",
-    "unicorn/filename-case": "off",
-    "unicorn/no-process-exit": "error",
-    "unicorn/prefer-ternary": "error",
-    "unicorn/prefer-top-level-await": "off",
-    "no-useless-constructor": "error",
+    "no-console": "warn",
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-unused-vars": "off", // replaced by TS version
+    "no-var": "error",
+    "eqeqeq": ["error", "always"],
+    "curly": ["error", "all"],
+    "no-implicit-coercion": "error",
+
+    /* -----------------------------
+     * TYPECRIPT RULES
+     * ----------------------------- */
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
         "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_",
-      },
+        "varsIgnorePattern": "^_"
+      }
     ],
-    "@typescript-eslint/no-namespace": "error",
-    "camelcase": "off",
-    "unicorn/prefer-code-point": "error",
-    "unicorn/prefer-string-slice": "off",
-    "unicorn/prefer-at": "off",
-    "unicorn/explicit-length-check": "off",
-    "unicorn/prefer-set-has": "off",
-    "no-empty": [
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-explicit-any": ["warn", { "ignoreRestArgs": true }],
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      { "prefer": "type-imports", "fixStyle": "separate-type-imports" }
+    ],
+    "@typescript-eslint/no-floating-promises": "error",
+
+    /* -----------------------------
+     * IMPORT RULES (BEST PRACTICE)
+     * ----------------------------- */
+    "import/no-unresolved": "error",
+    "import/no-duplicates": "error",
+    "import/order": [
       "error",
       {
-        "allowEmptyCatch": true,
-      },
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          ["parent", "sibling", "index"]
+        ],
+        "newlines-between": "always",
+        "alphabetize": { "order": "asc", "caseInsensitive": true }
+      }
     ],
-    "prefer-const": "error",
-    "unicorn/no-empty-file": "error",
-    "@typescript-eslint/no-non-null-assertion": "off",
+
+    /* -----------------------------
+     * UNICORN RULES
+     * ----------------------------- */
+    "unicorn/prefer-module": "off",
+    "unicorn/prevent-abbreviations": "off",
+    "unicorn/filename-case": "off",
+    "unicorn/no-null": "off",
+    "unicorn/no-process-exit": "error",
+
+    /* -----------------------------
+     * SPELLCHECK
+     * ----------------------------- */
+    "spellcheck/spell-checker": [
+      "warn",
+      {
+        "skipWords": ["KhulnaSoft", "khulnasoft", "CLI"],
+        "skipIfMatch": ["^[A-Z][a-z]+Soft$"],
+        "minLength": 3
+      }
+    ],
+
+    /* -----------------------------
+     * PROMISE RULES
+     * ----------------------------- */
+    "promise/always-return": "off",
+    "promise/no-return-wrap": "error",
+    "promise/no-nesting": "warn",
+    "promise/no-multiple-resolved": "error",
+
+    /* -----------------------------
+     * JSON, YAML, MARKDOWN
+     * ----------------------------- */
+    "jsonc/indent": ["error", 2],
+    "yaml/indent": ["error", 2],
+    "jsonc/object-curly-spacing": ["error", "always"],
+
+    /* -----------------------------
+     * PRETTIER ENFORCEMENT
+     * ----------------------------- */
+    "prettier/prettier": "error"
   },
+
+  "overrides": [
+    /* -----------------------------
+     * VITEST SUPPORT
+     * ----------------------------- */
+    {
+      "files": ["**/*.test.ts", "**/tests/**/*.ts"],
+      "env": { "vitest/globals": true },
+      "plugins": ["vitest"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "no-console": "off"
+      }
+    },
+
+    /* -----------------------------
+     * MARKDOWN CODEBLOCKS (fix parsing)
+     * ----------------------------- */
+    {
+      "files": ["**/*.md"],
+      "processor": "markdown/markdown"
+    },
+    {
+      "files": ["**/*.md/*.js", "**/*.md/*.ts"],
+      "parserOptions": { "project": null },
+      "rules": {
+        "no-undef": "off",
+        "import/no-unresolved": "off"
+      }
+    }
+  ]
 }
