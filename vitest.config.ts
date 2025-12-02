@@ -4,4 +4,7 @@ export default defineConfig({
   test: {
     workspace: ["packages/*"],
   },
+  worker: {
+    format: "es",
+  },
 });
