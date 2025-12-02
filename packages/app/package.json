@@ -41,6 +41,7 @@
     "@cloudflare/workers-types": "^4.20240512.0",
     "@jsdevtools/ez-spawn": "^3.0.4",
     "@nuxt/eslint": "^0.7.4",
+    "@nuxtjs/icon": "3.0.0-beta.16",
     "@octokit/auth-unauthenticated": "^5.0.1",
     "@pkg-khulnasoft/utils": "workspace:^",
     "@simulacrum/github-api-simulator": "^0.5.4",
